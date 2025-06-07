@@ -42,12 +42,13 @@ interface SchoolData {
     url: string;
     caption: string;
     date: string;
+    category?: string;
   }>;
   admissionInquiries: Array<{
     id: string;
     studentName: string;
     classApplied: string;
-    previousClass: string;
+    presentClass: string;
     previousSchool: string;
     fatherName: string;
     motherName: string;
@@ -67,14 +68,14 @@ interface SchoolState {
 
 const initialState: SchoolState = {
   data: {
-    schoolName: "",
+    schoolName: "New Narayana School",
     schoolLogo: "/placeholder.svg",
     welcomeMessage: "Welcome to New Narayana School - Nurturing Excellence in Education",
     welcomeImage: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1",
     latestUpdates: [
       {
         id: "1",
-        content: "Admission Open for Academic Year 2024-25",
+        content: "Admission Open for Academic Year 2025-26",
         date: "2024-01-15"
       },
       {
@@ -88,8 +89,8 @@ const initialState: SchoolState = {
         date: "2024-01-13"
       }
     ],
-    schoolHistory: "Established in 1995, New Narayana School has been a beacon of quality education, fostering academic excellence and character development.",
-    yearEstablished: "1995",
+    schoolHistory: "Established in 2025, New Narayana School has been a beacon of quality education, fostering academic excellence and character development.",
+    yearEstablished: "2025",
     educationalSociety: "Narayana Educational Society has been dedicated to promoting quality education and holistic development of students across the region.",
     founderDetails: [
       {
@@ -103,7 +104,7 @@ const initialState: SchoolState = {
       address: "123 Education Street, Knowledge City, State - 123456",
       email: "info@newnarayanaschool.edu",
       phone: "+91 98765 43210",
-      mapEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3024.123456789!2d-74.123456789!3d40.123456789!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x123456789abcdef%3A0x123456789abcdef!2sSchool!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus"
+      mapEmbed: ""
     },
     navigationItems: [
       { name: "Home", path: "/", visible: true },
@@ -118,7 +119,7 @@ const initialState: SchoolState = {
       {
         id: "1",
         title: "Admission Open",
-        content: "Admissions are now open for the academic year 2024-25. Please visit the admissions office for more details.",
+        content: "Admissions are now open for the academic year 2025-26. Please visit the admissions office for more details.",
         date: "2024-01-15"
       }
     ],
@@ -127,7 +128,8 @@ const initialState: SchoolState = {
         id: "1",
         url: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1",
         caption: "School Building",
-        date: "2024-01-01"
+        date: "2024-01-01",
+        category: "general"
       }
     ],
     admissionInquiries: []

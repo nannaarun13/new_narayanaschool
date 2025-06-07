@@ -1,12 +1,19 @@
 
 import { useSchool } from '@/contexts/SchoolContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 
 const Contact = () => {
   const { state } = useSchool();
   const { contactInfo } = state.data;
+
+  const handleMapClick = () => {
+    if (contactInfo.mapEmbed) {
+      // Extract coordinates or place name from embed URL and redirect to Google Maps
+      const googleMapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(contactInfo.address)}`;
+      window.open(googleMapsUrl, '_blank');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-school-white">
@@ -57,85 +64,48 @@ const Contact = () => {
             <Card className="text-center hover:shadow-lg transition-shadow duration-300 border-school-orange/20">
               <CardContent className="p-6">
                 <Clock className="h-12 w-12 text-school-orange mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-school-orange mb-2">Office Hours</h3>
+                <h3 className="text-lg font-semibold text-school-orange mb-2">School Times</h3>
                 <p className="text-gray-600">
-                  Mon - Fri: 8:00 AM - 4:00 PM<br />
-                  Sat: 8:00 AM - 12:00 PM
+                  Mon - Sat: 8:00 AM - 4:00 PM<br />
+                  Sunday: Closed
                 </p>
               </CardContent>
             </Card>
           </div>
         </section>
 
-        {/* Map and Quick Contact */}
+        {/* Map Section */}
         <section className="animate-fade-in">
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Map */}
-            <Card className="hover:shadow-lg transition-shadow duration-300 border-school-blue/20">
-              <CardHeader className="bg-school-blue-light">
-                <CardTitle className="text-2xl text-school-blue">Find Us</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {contactInfo.mapEmbed && contactInfo.mapEmbed.includes('google.com/maps') ? (
-                  <div className="h-64 rounded-lg overflow-hidden">
-                    <iframe
-                      src={contactInfo.mapEmbed}
-                      className="w-full h-full border-0"
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title="School Location"
-                    />
-                  </div>
-                ) : (
-                  <div className="h-64 bg-gray-200 rounded-lg flex items-center justify-center border border-gray-300">
-                    <p className="text-gray-500 text-center">
-                      Map will be displayed here<br />
-                      (Admin can update location through admin panel)
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Quick Contact */}
-            <Card className="hover:shadow-lg transition-shadow duration-300 border-school-orange/20">
-              <CardHeader className="bg-school-orange-light">
-                <CardTitle className="text-2xl text-school-blue">Quick Contact</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h4 className="font-semibold text-school-blue mb-2">Admissions Enquiry</h4>
-                  <p className="text-gray-600 mb-2">
-                    For admission related queries and school visits
-                  </p>
-                  <Button className="w-full bg-school-blue hover:bg-school-blue/90">
-                    Contact Admissions Office
-                  </Button>
+          <Card className="hover:shadow-lg transition-shadow duration-300 border-school-blue/20">
+            <CardHeader className="bg-school-blue-light">
+              <CardTitle className="text-2xl text-school-blue">Find Us</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {contactInfo.mapEmbed ? (
+                <div 
+                  className="h-64 rounded-lg overflow-hidden cursor-pointer"
+                  onClick={handleMapClick}
+                  title="Click to open in Google Maps"
+                >
+                  <iframe
+                    src={contactInfo.mapEmbed}
+                    className="w-full h-full border-0"
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="School Location"
+                  />
                 </div>
-                
-                <div>
-                  <h4 className="font-semibold text-school-blue mb-2">General Information</h4>
-                  <p className="text-gray-600 mb-2">
-                    For general queries about school facilities and programs
+              ) : (
+                <div className="h-64 bg-gray-200 rounded-lg flex items-center justify-center border border-gray-300">
+                  <p className="text-gray-500 text-center">
+                    Map will be displayed here<br />
+                    (Admin can update location through admin panel)
                   </p>
-                  <Button variant="outline" className="w-full border-school-blue text-school-blue hover:bg-school-blue hover:text-white">
-                    Contact Main Office
-                  </Button>
                 </div>
-
-                <div>
-                  <h4 className="font-semibold text-school-blue mb-2">Academic Support</h4>
-                  <p className="text-gray-600 mb-2">
-                    For academic queries and student support services
-                  </p>
-                  <Button variant="outline" className="w-full border-school-orange text-school-orange hover:bg-school-orange hover:text-white">
-                    Contact Academic Office
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              )}
+            </CardContent>
+          </Card>
         </section>
       </div>
     </div>

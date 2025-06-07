@@ -5,10 +5,23 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
+const categories = [
+  { id: 'all', name: 'All' },
+  { id: 'general', name: 'General' },
+  { id: 'event', name: 'Events' },
+  { id: 'festival', name: 'Festival Celebration' },
+  { id: 'activities', name: 'Activities' }
+];
+
 const Gallery = () => {
   const { state } = useSchool();
   const { galleryImages } = state.data;
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+
+  const filteredImages = selectedCategory === 'all' 
+    ? galleryImages 
+    : galleryImages.filter(img => img.category === selectedCategory);
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
@@ -22,10 +35,29 @@ const Gallery = () => {
         </p>
       </section>
 
+      {/* Category Filter */}
+      <section className="animate-fade-in">
+        <div className="flex flex-wrap gap-2 justify-center">
+          {categories.map((category) => (
+            <Button
+              key={category.id}
+              variant={selectedCategory === category.id ? "default" : "outline"}
+              onClick={() => setSelectedCategory(category.id)}
+              className={selectedCategory === category.id 
+                ? "bg-school-blue hover:bg-school-blue/90" 
+                : "border-school-blue text-school-blue hover:bg-school-blue hover:text-white"
+              }
+            >
+              {category.name}
+            </Button>
+          ))}
+        </div>
+      </section>
+
       {/* Gallery Grid */}
       <section className="animate-fade-in">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {galleryImages.map((image) => (
+          {filteredImages.map((image) => (
             <Card 
               key={image.id} 
               className="overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
@@ -40,10 +72,21 @@ const Gallery = () => {
               </div>
               <CardContent className="p-4">
                 <p className="text-sm text-gray-600">{image.caption}</p>
+                {image.category && (
+                  <span className="inline-block mt-2 px-2 py-1 bg-school-blue/10 text-school-blue text-xs rounded-full">
+                    {categories.find(cat => cat.id === image.category)?.name || image.category}
+                  </span>
+                )}
               </CardContent>
             </Card>
           ))}
         </div>
+
+        {filteredImages.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">No images found for this category.</p>
+          </div>
+        )}
       </section>
 
       {/* Image Modal */}
