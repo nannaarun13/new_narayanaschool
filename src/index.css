@@ -73,7 +73,21 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-school-white text-foreground;
+  }
+
+  /* Apply blue-orange-white color scheme globally */
+  .bg-background {
+    @apply bg-school-white;
+  }
+
+  /* Ensure all primary buttons use school colors */
+  .btn-primary {
+    @apply bg-school-blue hover:bg-school-blue/90 text-white;
+  }
+
+  .btn-secondary {
+    @apply bg-school-orange hover:bg-school-orange/90 text-white;
   }
 }
 
@@ -105,6 +119,10 @@
   .bg-school-orange {
     background-color: hsl(var(--school-orange));
   }
+
+  .bg-school-white {
+    background-color: hsl(var(--school-white));
+  }
   
   .bg-school-blue-light {
     background-color: hsl(var(--school-blue-light));
@@ -112,6 +130,14 @@
   
   .bg-school-orange-light {
     background-color: hsl(var(--school-orange-light));
+  }
+
+  .border-school-blue {
+    border-color: hsl(var(--school-blue));
+  }
+
+  .border-school-orange {
+    border-color: hsl(var(--school-orange));
   }
   
   .animate-fade-in {
@@ -145,5 +171,31 @@
     .text-5xl {
       font-size: 3rem;
     }
+  }
+
+  /* Color scheme enforcement */
+  .card {
+    @apply bg-school-white border-school-blue/10;
+  }
+
+  .input {
+    @apply border-school-blue/30 focus:border-school-blue;
+  }
+
+  /* Button variants with school colors */
+  .button-primary {
+    @apply bg-school-blue hover:bg-school-blue/90 text-white;
+  }
+
+  .button-secondary {
+    @apply bg-school-orange hover:bg-school-orange/90 text-white;
+  }
+
+  .button-outline-blue {
+    @apply border-school-blue text-school-blue hover:bg-school-blue hover:text-white;
+  }
+
+  .button-outline-orange {
+    @apply border-school-orange text-school-orange hover:bg-school-orange hover:text-white;
   }
 }

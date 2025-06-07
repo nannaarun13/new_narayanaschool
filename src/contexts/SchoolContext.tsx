@@ -6,12 +6,20 @@ interface SchoolData {
   schoolLogo: string;
   welcomeMessage: string;
   welcomeImage: string;
-  latestUpdates: string[];
+  latestUpdates: Array<{
+    id: string;
+    content: string;
+    date: string;
+  }>;
   schoolHistory: string;
   yearEstablished: string;
   educationalSociety: string;
-  founderDetails: string;
-  founderImages: string[];
+  founderDetails: Array<{
+    id: string;
+    name: string;
+    description: string;
+    image: string;
+  }>;
   contactInfo: {
     address: string;
     email: string;
@@ -39,11 +47,15 @@ interface SchoolData {
     id: string;
     studentName: string;
     classApplied: string;
+    previousClass: string;
+    previousSchool: string;
     fatherName: string;
     motherName: string;
     primaryContact: string;
+    secondaryContact: string;
+    location: string;
+    additionalInfo: string;
     submittedDate: string;
-    [key: string]: any;
   }>;
 }
 
@@ -55,20 +67,38 @@ interface SchoolState {
 
 const initialState: SchoolState = {
   data: {
-    schoolName: "New Narayana School",
+    schoolName: "",
     schoolLogo: "/placeholder.svg",
     welcomeMessage: "Welcome to New Narayana School - Nurturing Excellence in Education",
     welcomeImage: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1",
     latestUpdates: [
-      "Admission Open for Academic Year 2024-25",
-      "Annual Sports Day scheduled for December 15th",
-      "Parent-Teacher Meeting on November 30th"
+      {
+        id: "1",
+        content: "Admission Open for Academic Year 2024-25",
+        date: "2024-01-15"
+      },
+      {
+        id: "2", 
+        content: "Annual Sports Day scheduled for December 15th",
+        date: "2024-01-14"
+      },
+      {
+        id: "3",
+        content: "Parent-Teacher Meeting on November 30th",
+        date: "2024-01-13"
+      }
     ],
-    schoolHistory: "Established in 1995, New Narayana School has been a beacon of quality education, fostering academic excellence and character development for over 25 years.",
+    schoolHistory: "Established in 1995, New Narayana School has been a beacon of quality education, fostering academic excellence and character development.",
     yearEstablished: "1995",
-    educationalSociety: "Narayana Educational Society",
-    founderDetails: "Founded by Dr. P. Narayana with a vision to provide world-class education accessible to all.",
-    founderImages: ["https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"],
+    educationalSociety: "Narayana Educational Society has been dedicated to promoting quality education and holistic development of students across the region.",
+    founderDetails: [
+      {
+        id: "1",
+        name: "Dr. P. Narayana",
+        description: "Founded with a vision to provide world-class education accessible to all.",
+        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"
+      }
+    ],
     contactInfo: {
       address: "123 Education Street, Knowledge City, State - 123456",
       email: "info@newnarayanaschool.edu",
@@ -116,6 +146,12 @@ type SchoolAction =
   | { type: 'DELETE_GALLERY_IMAGE'; payload: string }
   | { type: 'ADD_ADMISSION_INQUIRY'; payload: any }
   | { type: 'DELETE_ADMISSION_INQUIRY'; payload: string }
+  | { type: 'ADD_LATEST_UPDATE'; payload: any }
+  | { type: 'UPDATE_LATEST_UPDATE'; payload: { id: string; update: any } }
+  | { type: 'DELETE_LATEST_UPDATE'; payload: string }
+  | { type: 'ADD_FOUNDER'; payload: any }
+  | { type: 'UPDATE_FOUNDER'; payload: { id: string; founder: any } }
+  | { type: 'DELETE_FOUNDER'; payload: string }
   | { type: 'LOAD_PERSISTED_DATA'; payload: SchoolData }
   | { type: 'CLEANUP_OLD_INQUIRIES' };
 
@@ -204,6 +240,64 @@ function schoolReducer(state: SchoolState, action: SchoolAction): SchoolState {
         data: {
           ...state.data,
           admissionInquiries: state.data.admissionInquiries.filter(inquiry => inquiry.id !== action.payload)
+        }
+      };
+      break;
+    case 'ADD_LATEST_UPDATE':
+      newState = {
+        ...state,
+        data: {
+          ...state.data,
+          latestUpdates: [action.payload, ...state.data.latestUpdates]
+        }
+      };
+      break;
+    case 'UPDATE_LATEST_UPDATE':
+      newState = {
+        ...state,
+        data: {
+          ...state.data,
+          latestUpdates: state.data.latestUpdates.map(update =>
+            update.id === action.payload.id ? { ...update, ...action.payload.update } : update
+          )
+        }
+      };
+      break;
+    case 'DELETE_LATEST_UPDATE':
+      newState = {
+        ...state,
+        data: {
+          ...state.data,
+          latestUpdates: state.data.latestUpdates.filter(update => update.id !== action.payload)
+        }
+      };
+      break;
+    case 'ADD_FOUNDER':
+      newState = {
+        ...state,
+        data: {
+          ...state.data,
+          founderDetails: [action.payload, ...state.data.founderDetails]
+        }
+      };
+      break;
+    case 'UPDATE_FOUNDER':
+      newState = {
+        ...state,
+        data: {
+          ...state.data,
+          founderDetails: state.data.founderDetails.map(founder =>
+            founder.id === action.payload.id ? { ...founder, ...action.payload.founder } : founder
+          )
+        }
+      };
+      break;
+    case 'DELETE_FOUNDER':
+      newState = {
+        ...state,
+        data: {
+          ...state.data,
+          founderDetails: state.data.founderDetails.filter(founder => founder.id !== action.payload)
         }
       };
       break;

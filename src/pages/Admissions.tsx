@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,7 @@ import { useSchool } from '@/contexts/SchoolContext';
 
 const Admissions = () => {
   const { toast } = useToast();
-  const { state } = useSchool();
+  const { dispatch } = useSchool();
   const [formData, setFormData] = useState({
     studentName: '',
     classApplied: '',
@@ -41,8 +42,18 @@ const Admissions = () => {
       return;
     }
 
-    // Here you would typically send data to backend/database
-    console.log('Admission Form Submitted:', formData);
+    // Create admission inquiry object
+    const admissionInquiry = {
+      id: Date.now().toString(),
+      ...formData,
+      submittedDate: new Date().toISOString().split('T')[0]
+    };
+
+    // Add to context
+    dispatch({
+      type: 'ADD_ADMISSION_INQUIRY',
+      payload: admissionInquiry
+    });
     
     toast({
       title: "Application Submitted!",
@@ -65,7 +76,7 @@ const Admissions = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-school-white">
       <div className="container mx-auto px-4 py-8 space-y-12">
         {/* Page Header */}
         <section className="text-center animate-fade-in">
@@ -79,8 +90,8 @@ const Admissions = () => {
 
         {/* Admission Information */}
         <section className="animate-fade-in">
-          <Card className="hover:shadow-lg transition-shadow duration-300">
-            <CardHeader>
+          <Card className="hover:shadow-lg transition-shadow duration-300 border-school-blue/20">
+            <CardHeader className="bg-school-blue-light">
               <CardTitle className="text-3xl text-school-blue">Admission Process</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -113,8 +124,8 @@ const Admissions = () => {
 
         {/* Admission Form */}
         <section className="animate-fade-in">
-          <Card className="hover:shadow-lg transition-shadow duration-300">
-            <CardHeader>
+          <Card className="hover:shadow-lg transition-shadow duration-300 border-school-orange/20">
+            <CardHeader className="bg-school-orange-light">
               <CardTitle className="text-3xl text-school-blue">Admission Inquiry Form</CardTitle>
             </CardHeader>
             <CardContent>
@@ -129,6 +140,7 @@ const Admissions = () => {
                       onChange={handleInputChange}
                       placeholder="Enter student's full name"
                       required
+                      className="border-school-blue/30 focus:border-school-blue"
                     />
                   </div>
                   <div className="space-y-2">
@@ -140,6 +152,7 @@ const Admissions = () => {
                       onChange={handleInputChange}
                       placeholder="e.g., Class 1, Class 10"
                       required
+                      className="border-school-blue/30 focus:border-school-blue"
                     />
                   </div>
                 </div>
@@ -153,6 +166,7 @@ const Admissions = () => {
                       value={formData.previousClass}
                       onChange={handleInputChange}
                       placeholder="Last class attended"
+                      className="border-school-blue/30 focus:border-school-blue"
                     />
                   </div>
                   <div className="space-y-2">
@@ -163,6 +177,7 @@ const Admissions = () => {
                       value={formData.previousSchool}
                       onChange={handleInputChange}
                       placeholder="Name of previous school"
+                      className="border-school-blue/30 focus:border-school-blue"
                     />
                   </div>
                 </div>
@@ -177,6 +192,7 @@ const Admissions = () => {
                       onChange={handleInputChange}
                       placeholder="Enter father's name"
                       required
+                      className="border-school-blue/30 focus:border-school-blue"
                     />
                   </div>
                   <div className="space-y-2">
@@ -187,6 +203,7 @@ const Admissions = () => {
                       value={formData.motherName}
                       onChange={handleInputChange}
                       placeholder="Enter mother's name"
+                      className="border-school-blue/30 focus:border-school-blue"
                     />
                   </div>
                 </div>
@@ -202,6 +219,7 @@ const Admissions = () => {
                       onChange={handleInputChange}
                       placeholder="+91 98765 43210"
                       required
+                      className="border-school-blue/30 focus:border-school-blue"
                     />
                   </div>
                   <div className="space-y-2">
@@ -213,6 +231,7 @@ const Admissions = () => {
                       value={formData.secondaryContact}
                       onChange={handleInputChange}
                       placeholder="+91 98765 43210"
+                      className="border-school-blue/30 focus:border-school-blue"
                     />
                   </div>
                 </div>
@@ -225,6 +244,7 @@ const Admissions = () => {
                     value={formData.location}
                     onChange={handleInputChange}
                     placeholder="Enter your location/address"
+                    className="border-school-blue/30 focus:border-school-blue"
                   />
                 </div>
 
@@ -237,6 +257,7 @@ const Admissions = () => {
                     onChange={handleInputChange}
                     placeholder="Any additional information you'd like to share"
                     rows={4}
+                    className="border-school-blue/30 focus:border-school-blue"
                   />
                 </div>
 
@@ -251,32 +272,6 @@ const Admissions = () => {
           </Card>
         </section>
       </div>
-
-      {/* Contact Information with colored background */}
-      <section className="bg-gradient-to-r from-yellow-200 via-yellow-300 to-yellow-400 py-16 animate-fade-in">
-        <div className="container mx-auto px-4">
-          <Card className="bg-white/90 backdrop-blur-sm shadow-lg">
-            <CardContent className="p-8 text-center">
-              <h3 className="text-2xl font-bold text-school-blue mb-4">
-                Need Help with Admissions?
-              </h3>
-              <p className="text-gray-700 mb-6">
-                Contact our admissions office for any questions or to schedule a visit
-              </p>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-semibold text-school-blue mb-2">Phone</h4>
-                  <p className="text-gray-700">{state.data.contactInfo.phone}</p>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-school-blue mb-2">Email</h4>
-                  <p className="text-gray-700">{state.data.contactInfo.email}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
     </div>
   );
 };

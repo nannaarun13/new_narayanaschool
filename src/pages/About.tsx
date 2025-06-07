@@ -8,8 +8,7 @@ const About = () => {
     schoolHistory, 
     yearEstablished, 
     educationalSociety, 
-    founderDetails, 
-    founderImages 
+    founderDetails
   } = state.data;
 
   return (
@@ -31,25 +30,11 @@ const About = () => {
             <CardTitle className="text-3xl text-school-blue">Our History</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid md:grid-cols-3 gap-6 mb-6">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-school-orange mb-2">
-                  {yearEstablished}
-                </div>
-                <p className="text-gray-600">Year Established</p>
+            <div className="text-center mb-6">
+              <div className="text-4xl font-bold text-school-orange mb-2">
+                {yearEstablished}
               </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-school-orange mb-2">
-                  25+
-                </div>
-                <p className="text-gray-600">Years of Excellence</p>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-school-orange mb-2">
-                  1000+
-                </div>
-                <p className="text-gray-600">Alumni</p>
-              </div>
+              <p className="text-gray-600">Year Established</p>
             </div>
             <p className="text-lg text-gray-700 leading-relaxed">
               {schoolHistory}
@@ -66,43 +51,39 @@ const About = () => {
           </CardHeader>
           <CardContent>
             <p className="text-lg text-gray-700 leading-relaxed">
-              We are proudly affiliated with the <strong>{educationalSociety}</strong>, 
-              which has been dedicated to promoting quality education and holistic development 
-              of students across the region. Our society believes in creating an environment 
-              where every student can thrive academically, socially, and personally.
+              {educationalSociety}
             </p>
           </CardContent>
         </Card>
       </section>
 
-      {/* Founder Details */}
+      {/* Founders */}
       <section className="animate-fade-in">
         <Card className="hover:shadow-lg transition-shadow duration-300">
           <CardHeader>
-            <CardTitle className="text-3xl text-school-blue">Our Founder</CardTitle>
+            <CardTitle className="text-3xl text-school-blue">Our Founders</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              <div>
-                <p className="text-lg text-gray-700 leading-relaxed mb-4">
-                  {founderDetails}
-                </p>
-                <p className="text-gray-600">
-                  Our founder's vision continues to guide our mission of providing 
-                  accessible, high-quality education that prepares students for success 
-                  in an ever-changing world.
-                </p>
-              </div>
-              <div className="space-y-4">
-                {founderImages.map((image, index) => (
-                  <img
-                    key={index}
-                    src={image}
-                    alt={`Founder ${index + 1}`}
-                    className="w-full h-64 object-cover rounded-lg shadow-md"
-                  />
-                ))}
-              </div>
+            <div className="grid gap-8">
+              {founderDetails.map((founder) => (
+                <div key={founder.id} className="grid md:grid-cols-2 gap-8 items-center">
+                  <div>
+                    <h3 className="text-2xl font-semibold text-school-blue mb-4">
+                      {founder.name}
+                    </h3>
+                    <p className="text-lg text-gray-700 leading-relaxed">
+                      {founder.description}
+                    </p>
+                  </div>
+                  <div>
+                    <img
+                      src={founder.image}
+                      alt={founder.name}
+                      className="w-full h-64 object-cover rounded-lg shadow-md"
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>

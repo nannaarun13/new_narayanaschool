@@ -9,7 +9,7 @@ const Contact = () => {
   const { contactInfo } = state.data;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-school-white">
       <div className="container mx-auto px-4 py-8 space-y-12">
         {/* Page Header */}
         <section className="text-center animate-fade-in">
@@ -24,7 +24,7 @@ const Contact = () => {
         {/* Contact Information Grid */}
         <section className="animate-fade-in">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <Card className="text-center hover:shadow-lg transition-shadow duration-300">
+            <Card className="text-center hover:shadow-lg transition-shadow duration-300 border-school-blue/20">
               <CardContent className="p-6">
                 <MapPin className="h-12 w-12 text-school-blue mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-school-blue mb-2">Address</h3>
@@ -34,17 +34,17 @@ const Contact = () => {
               </CardContent>
             </Card>
 
-            <Card className="text-center hover:shadow-lg transition-shadow duration-300">
+            <Card className="text-center hover:shadow-lg transition-shadow duration-300 border-school-orange/20">
               <CardContent className="p-6">
-                <Phone className="h-12 w-12 text-school-blue mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-school-blue mb-2">Phone</h3>
+                <Phone className="h-12 w-12 text-school-orange mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-school-orange mb-2">Phone</h3>
                 <p className="text-gray-600">
                   {contactInfo.phone}
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="text-center hover:shadow-lg transition-shadow duration-300">
+            <Card className="text-center hover:shadow-lg transition-shadow duration-300 border-school-blue/20">
               <CardContent className="p-6">
                 <Mail className="h-12 w-12 text-school-blue mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-school-blue mb-2">Email</h3>
@@ -54,10 +54,10 @@ const Contact = () => {
               </CardContent>
             </Card>
 
-            <Card className="text-center hover:shadow-lg transition-shadow duration-300">
+            <Card className="text-center hover:shadow-lg transition-shadow duration-300 border-school-orange/20">
               <CardContent className="p-6">
-                <Clock className="h-12 w-12 text-school-blue mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-school-blue mb-2">Office Hours</h3>
+                <Clock className="h-12 w-12 text-school-orange mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-school-orange mb-2">Office Hours</h3>
                 <p className="text-gray-600">
                   Mon - Fri: 8:00 AM - 4:00 PM<br />
                   Sat: 8:00 AM - 12:00 PM
@@ -71,12 +71,12 @@ const Contact = () => {
         <section className="animate-fade-in">
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Map */}
-            <Card className="hover:shadow-lg transition-shadow duration-300">
-              <CardHeader>
+            <Card className="hover:shadow-lg transition-shadow duration-300 border-school-blue/20">
+              <CardHeader className="bg-school-blue-light">
                 <CardTitle className="text-2xl text-school-blue">Find Us</CardTitle>
               </CardHeader>
               <CardContent>
-                {contactInfo.mapEmbed ? (
+                {contactInfo.mapEmbed && contactInfo.mapEmbed.includes('google.com/maps') ? (
                   <div className="h-64 rounded-lg overflow-hidden">
                     <iframe
                       src={contactInfo.mapEmbed}
@@ -84,10 +84,11 @@ const Contact = () => {
                       allowFullScreen
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
+                      title="School Location"
                     />
                   </div>
                 ) : (
-                  <div className="h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+                  <div className="h-64 bg-gray-200 rounded-lg flex items-center justify-center border border-gray-300">
                     <p className="text-gray-500 text-center">
                       Map will be displayed here<br />
                       (Admin can update location through admin panel)
@@ -98,8 +99,8 @@ const Contact = () => {
             </Card>
 
             {/* Quick Contact */}
-            <Card className="hover:shadow-lg transition-shadow duration-300">
-              <CardHeader>
+            <Card className="hover:shadow-lg transition-shadow duration-300 border-school-orange/20">
+              <CardHeader className="bg-school-orange-light">
                 <CardTitle className="text-2xl text-school-blue">Quick Contact</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -137,42 +138,6 @@ const Contact = () => {
           </div>
         </section>
       </div>
-
-      {/* Directions with colored background */}
-      <section className="bg-gradient-to-r from-yellow-200 via-yellow-300 to-yellow-400 py-16 animate-fade-in">
-        <div className="container mx-auto px-4">
-          <Card className="bg-white/90 backdrop-blur-sm shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-3xl text-school-blue text-center">How to Reach Us</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-3 gap-6 text-center">
-                <div>
-                  <h4 className="font-semibold text-school-blue mb-2">By Car</h4>
-                  <p className="text-gray-700">
-                    Take the main highway exit at Education District. 
-                    Free parking available on campus.
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-school-blue mb-2">By Public Transport</h4>
-                  <p className="text-gray-700">
-                    Bus routes 12, 15, and 23 stop directly at our school gate. 
-                    Metro station is 500m away.
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-school-blue mb-2">School Bus</h4>
-                  <p className="text-gray-700">
-                    We provide school bus services covering major areas. 
-                    Contact us for route information.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
     </div>
   );
 };

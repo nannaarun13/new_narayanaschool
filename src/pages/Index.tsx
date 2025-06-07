@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 
 const Index = () => {
   const { state } = useSchool();
-  const { welcomeMessage, welcomeImage, latestUpdates, galleryImages } = state.data;
+  const { welcomeMessage, welcomeImage, latestUpdates, galleryImages, schoolLogo, schoolName } = state.data;
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-12">
@@ -18,9 +18,18 @@ const Index = () => {
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-            <h2 className="text-4xl md:text-6xl font-bold text-white text-center px-4">
-              {welcomeMessage}
-            </h2>
+            <div className="flex flex-col items-center space-y-4">
+              {schoolLogo && (
+                <img
+                  src={schoolLogo}
+                  alt="School Logo"
+                  className="h-24 w-24 object-contain bg-white rounded-full p-2"
+                />
+              )}
+              <h2 className="text-4xl md:text-6xl font-bold text-white text-center px-4">
+                {welcomeMessage}
+              </h2>
+            </div>
           </div>
         </div>
       </section>
@@ -31,12 +40,15 @@ const Index = () => {
           Latest Updates
         </h3>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {latestUpdates.map((update, index) => (
-            <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
+          {latestUpdates.map((update) => (
+            <Card key={update.id} className="hover:shadow-lg transition-shadow duration-300">
               <CardContent className="p-6">
                 <div className="flex items-start space-x-3">
                   <Badge className="bg-school-orange text-white">New</Badge>
-                  <p className="text-gray-700 flex-1">{update}</p>
+                  <div className="flex-1">
+                    <p className="text-gray-700">{update.content}</p>
+                    <p className="text-sm text-gray-500 mt-2">{update.date}</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -47,7 +59,7 @@ const Index = () => {
       {/* Featured Gallery */}
       <section className="animate-fade-in">
         <h3 className="text-3xl font-bold text-school-blue mb-6 text-center">
-          School Life
+          Gallery
         </h3>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {galleryImages.slice(0, 6).map((image) => (
