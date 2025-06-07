@@ -26,7 +26,7 @@ const AdmissionManager = () => {
     const exportData = admissions.map(admission => ({
       'Student Name': admission.studentName,
       'Class Applied': admission.classApplied,
-      'Previous Class': admission.previousClass,
+      'Present Class': admission.presentClass,
       'Previous School': admission.previousSchool,
       'Father Name': admission.fatherName,
       'Mother Name': admission.motherName,
@@ -135,7 +135,7 @@ const AdmissionManager = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
                           <p><strong>Class Applied:</strong> {admission.classApplied}</p>
-                          <p><strong>Previous Class:</strong> {admission.previousClass || 'N/A'}</p>
+                          <p><strong>Present Class:</strong> {admission.presentClass || 'N/A'}</p>
                           <p><strong>Previous School:</strong> {admission.previousSchool || 'N/A'}</p>
                         </div>
                         <div>
