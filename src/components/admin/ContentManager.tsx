@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -31,6 +30,9 @@ const ContentManager = () => {
   const [newFounder, setNewFounder] = useState({ name: '', description: '', image: '' });
   const [editingFounder, setEditingFounder] = useState<string | null>(null);
   const [editFounderData, setEditFounderData] = useState({ name: '', description: '', image: '' });
+
+  // Safe access to founderDetails with fallback
+  const founderDetails = Array.isArray(state.data.founderDetails) ? state.data.founderDetails : [];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -382,65 +384,69 @@ const ContentManager = () => {
 
             {/* Current Founders */}
             <div className="space-y-4">
-              {state.data.founderDetails.map((founder) => (
-                <div key={founder.id} className="border rounded-lg p-4">
-                  {editingFounder === founder.id ? (
-                    <div className="space-y-4">
-                      <Input
-                        value={editFounderData.name}
-                        onChange={(e) => setEditFounderData(prev => ({ ...prev, name: e.target.value }))}
-                        placeholder="Founder name"
-                      />
-                      <Textarea
-                        value={editFounderData.description}
-                        onChange={(e) => setEditFounderData(prev => ({ ...prev, description: e.target.value }))}
-                        rows={3}
-                      />
-                      <ImageUpload
-                        label="Founder Image"
-                        currentImage={editFounderData.image}
-                        onImageUpload={(url) => setEditFounderData(prev => ({ ...prev, image: url }))}
-                      />
-                      <div className="flex space-x-2">
-                        <Button onClick={handleSaveFounderEdit} size="sm" className="bg-green-600 hover:bg-green-700">
-                          <Save className="h-4 w-4 mr-1" />
-                          Save
-                        </Button>
-                        <Button onClick={() => setEditingFounder(null)} variant="outline" size="sm">
-                          <X className="h-4 w-4 mr-1" />
-                          Cancel
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex items-start justify-between">
-                      <div className="flex space-x-4 flex-1">
-                        <img
-                          src={founder.image}
-                          alt={founder.name}
-                          className="w-16 h-16 object-cover rounded"
+              {founderDetails.length > 0 ? (
+                founderDetails.map((founder) => (
+                  <div key={founder.id} className="border rounded-lg p-4">
+                    {editingFounder === founder.id ? (
+                      <div className="space-y-4">
+                        <Input
+                          value={editFounderData.name}
+                          onChange={(e) => setEditFounderData(prev => ({ ...prev, name: e.target.value }))}
+                          placeholder="Founder name"
                         />
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-lg">{founder.name}</h3>
-                          <p className="text-gray-600 mt-1">{founder.description}</p>
+                        <Textarea
+                          value={editFounderData.description}
+                          onChange={(e) => setEditFounderData(prev => ({ ...prev, description: e.target.value }))}
+                          rows={3}
+                        />
+                        <ImageUpload
+                          label="Founder Image"
+                          currentImage={editFounderData.image}
+                          onImageUpload={(url) => setEditFounderData(prev => ({ ...prev, image: url }))}
+                        />
+                        <div className="flex space-x-2">
+                          <Button onClick={handleSaveFounderEdit} size="sm" className="bg-green-600 hover:bg-green-700">
+                            <Save className="h-4 w-4 mr-1" />
+                            Save
+                          </Button>
+                          <Button onClick={() => setEditingFounder(null)} variant="outline" size="sm">
+                            <X className="h-4 w-4 mr-1" />
+                            Cancel
+                          </Button>
                         </div>
                       </div>
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="sm" onClick={() => handleEditFounder(founder)}>
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeleteFounder(founder.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                    ) : (
+                      <div className="flex items-start justify-between">
+                        <div className="flex space-x-4 flex-1">
+                          <img
+                            src={founder.image}
+                            alt={founder.name}
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-lg">{founder.name}</h3>
+                            <p className="text-gray-600 mt-1">{founder.description}</p>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button variant="outline" size="sm" onClick={() => handleEditFounder(founder)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleDeleteFounder(founder.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-center py-4">No founders added yet. Add your first founder above.</p>
+              )}
             </div>
           </CardContent>
         </Card>
