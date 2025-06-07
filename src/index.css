@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -72,12 +73,12 @@
   }
 
   body {
-    @apply bg-gray-50 text-foreground;
+    @apply bg-school-white text-foreground;
   }
 
   /* Apply blue-orange-white color scheme globally */
   .bg-background {
-    @apply bg-gray-50;
+    @apply bg-school-white;
   }
 
   /* Ensure all primary buttons use school colors */

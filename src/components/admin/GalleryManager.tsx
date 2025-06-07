@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useSchool } from '@/contexts/SchoolContext';
 import { useToast } from '@/hooks/use-toast';
 import { Trash2, Plus } from 'lucide-react';
@@ -13,19 +12,17 @@ import ImageUpload from './ImageUpload';
 const GalleryManager = () => {
   const { state, dispatch } = useSchool();
   const { toast } = useToast();
-  const [newImage, setNewImage] = useState({ url: '', caption: '', category: '' });
-
-  const categories = ['General', 'Event', 'Festivals', 'Activities'];
+  const [newImage, setNewImage] = useState({ url: '', caption: '' });
 
   const handleImageUpload = (imageUrl: string) => {
     setNewImage(prev => ({ ...prev, url: imageUrl }));
   };
 
   const handleAddImage = () => {
-    if (!newImage.url || !newImage.caption || !newImage.category) {
+    if (!newImage.url || !newImage.caption) {
       toast({
         title: "Missing Information",
-        description: "Please provide image, caption, and select a category.",
+        description: "Please provide both image and caption.",
         variant: "destructive"
       });
       return;
@@ -35,7 +32,6 @@ const GalleryManager = () => {
       id: Date.now().toString(),
       url: newImage.url,
       caption: newImage.caption,
-      category: newImage.category,
       date: new Date().toISOString().split('T')[0]
     };
 
@@ -44,7 +40,7 @@ const GalleryManager = () => {
       payload: imageData
     });
 
-    setNewImage({ url: '', caption: '', category: '' });
+    setNewImage({ url: '', caption: '' });
     toast({
       title: "Image Added",
       description: "New image has been added to the gallery.",
@@ -89,23 +85,6 @@ const GalleryManager = () => {
               placeholder="Enter image caption"
             />
           </div>
-
-          <div>
-            <Label htmlFor="imageCategory">Category *</Label>
-            <Select value={newImage.category} onValueChange={(value) => setNewImage(prev => ({ ...prev, category: value }))}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
           <Button onClick={handleAddImage} className="bg-school-blue hover:bg-school-blue/90">
             <Plus className="h-4 w-4 mr-2" />
             Add Image
@@ -113,45 +92,38 @@ const GalleryManager = () => {
         </CardContent>
       </Card>
 
-      {/* Current Images by Category */}
-      {categories.map((category) => {
-        const categoryImages = state.data.galleryImages.filter(img => img.category === category);
-        if (categoryImages.length === 0) return null;
-
-        return (
-          <Card key={category}>
-            <CardHeader>
-              <CardTitle>{category} Images ({categoryImages.length})</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {categoryImages.map((image) => (
-                  <div key={image.id} className="border rounded-lg overflow-hidden">
-                    <img
-                      src={image.url}
-                      alt={image.caption}
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="p-4">
-                      <p className="font-medium">{image.caption}</p>
-                      <p className="text-sm text-gray-600 mt-1">{image.date}</p>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="mt-2"
-                        onClick={() => handleDeleteImage(image.id)}
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        Delete
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+      {/* Current Images */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Current Gallery Images</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {state.data.galleryImages.map((image) => (
+              <div key={image.id} className="border rounded-lg overflow-hidden">
+                <img
+                  src={image.url}
+                  alt={image.caption}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="p-4">
+                  <p className="font-medium">{image.caption}</p>
+                  <p className="text-sm text-gray-600 mt-1">{image.date}</p>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => handleDeleteImage(image.id)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Delete
+                  </Button>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        );
-      })}
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

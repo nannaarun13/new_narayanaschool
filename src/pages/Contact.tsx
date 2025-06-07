@@ -9,14 +9,14 @@ const Contact = () => {
 
   const handleMapClick = () => {
     if (contactInfo.mapEmbed) {
-      // Extract location from embed URL or use the address
+      // Extract coordinates or place name from embed URL and redirect to Google Maps
       const googleMapsUrl = `https://www.google.com/maps/search/${encodeURIComponent(contactInfo.address)}`;
       window.open(googleMapsUrl, '_blank');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-school-white">
       <div className="container mx-auto px-4 py-8 space-y-12">
         {/* Page Header */}
         <section className="text-center animate-fade-in">
@@ -44,14 +44,10 @@ const Contact = () => {
             <Card className="text-center hover:shadow-lg transition-shadow duration-300 border-school-orange/20">
               <CardContent className="p-6">
                 <Phone className="h-12 w-12 text-school-orange mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-school-orange mb-2">Phone Numbers</h3>
-                <div className="text-gray-600 space-y-1">
-                  <p>{contactInfo.phone}</p>
-                  {contactInfo.phone2 && <p>{contactInfo.phone2}</p>}
-                  {contactInfo.phone3 && <p>{contactInfo.phone3}</p>}
-                  {contactInfo.phone4 && <p>{contactInfo.phone4}</p>}
-                  {contactInfo.phone5 && <p>{contactInfo.phone5}</p>}
-                </div>
+                <h3 className="text-lg font-semibold text-school-orange mb-2">Phone</h3>
+                <p className="text-gray-600">
+                  {contactInfo.phone}
+                </p>
               </CardContent>
             </Card>
 
@@ -70,7 +66,8 @@ const Contact = () => {
                 <Clock className="h-12 w-12 text-school-orange mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-school-orange mb-2">School Times</h3>
                 <p className="text-gray-600">
-                  Mon - Sat: 8:00 AM - 4:00 PM
+                  Mon - Sat: 8:00 AM - 4:00 PM<br />
+                  Sunday: Closed
                 </p>
               </CardContent>
             </Card>

@@ -65,57 +65,15 @@ const ContactManager = () => {
               onChange={handleInputChange}
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="phone">Primary Phone Number</Label>
-              <Input
-                id="phone"
-                name="phone"
-                type="tel"
-                value={contactData.phone}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <Label htmlFor="phone2">Phone Number 2</Label>
-              <Input
-                id="phone2"
-                name="phone2"
-                type="tel"
-                value={contactData.phone2}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <Label htmlFor="phone3">Phone Number 3</Label>
-              <Input
-                id="phone3"
-                name="phone3"
-                type="tel"
-                value={contactData.phone3}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <Label htmlFor="phone4">Phone Number 4</Label>
-              <Input
-                id="phone4"
-                name="phone4"
-                type="tel"
-                value={contactData.phone4}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <Label htmlFor="phone5">Phone Number 5</Label>
-              <Input
-                id="phone5"
-                name="phone5"
-                type="tel"
-                value={contactData.phone5}
-                onChange={handleInputChange}
-              />
-            </div>
+          <div>
+            <Label htmlFor="phone">Phone Number</Label>
+            <Input
+              id="phone"
+              name="phone"
+              type="tel"
+              value={contactData.phone}
+              onChange={handleInputChange}
+            />
           </div>
           <div>
             <Label htmlFor="mapEmbed">Map Embed URL</Label>
