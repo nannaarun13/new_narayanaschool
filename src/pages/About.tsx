@@ -8,7 +8,7 @@ const About = () => {
     schoolHistory, 
     yearEstablished, 
     educationalSociety, 
-    founderDetails
+    founderDetails = [] // Default to empty array if undefined
   } = state.data;
 
   return (
@@ -65,25 +65,29 @@ const About = () => {
           </CardHeader>
           <CardContent>
             <div className="grid gap-8">
-              {founderDetails.map((founder) => (
-                <div key={founder.id} className="grid md:grid-cols-2 gap-8 items-center">
-                  <div>
-                    <h3 className="text-2xl font-semibold text-school-blue mb-4">
-                      {founder.name}
-                    </h3>
-                    <p className="text-lg text-gray-700 leading-relaxed">
-                      {founder.description}
-                    </p>
+              {founderDetails && Array.isArray(founderDetails) && founderDetails.length > 0 ? (
+                founderDetails.map((founder) => (
+                  <div key={founder.id} className="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                      <h3 className="text-2xl font-semibold text-school-blue mb-4">
+                        {founder.name}
+                      </h3>
+                      <p className="text-lg text-gray-700 leading-relaxed">
+                        {founder.description}
+                      </p>
+                    </div>
+                    <div>
+                      <img
+                        src={founder.image}
+                        alt={founder.name}
+                        className="w-full h-64 object-cover rounded-lg shadow-md"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <img
-                      src={founder.image}
-                      alt={founder.name}
-                      className="w-full h-64 object-cover rounded-lg shadow-md"
-                    />
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-gray-500 text-center">No founder information available at the moment.</p>
+              )}
             </div>
           </CardContent>
         </Card>
