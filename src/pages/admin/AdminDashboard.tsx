@@ -1,127 +1,235 @@
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  Users, 
+  Image, 
+  Bell, 
+  Settings, 
+  FileText, 
+  Phone,
+  Shield,
+  Home,
+  LogOut
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { signOut, onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import { useToast } from '@/hooks/use-toast';
 import { useSchool } from '@/contexts/SchoolContext';
-import { Users, FileText, Calendar, Eye } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import ContentManager from '@/components/admin/ContentManager';
+import GalleryManager from '@/components/admin/GalleryManager';
+import NoticeManager from '@/components/admin/NoticeManager';
+import AdmissionManager from '@/components/admin/AdmissionManager';
+import ContactManager from '@/components/admin/ContactManager';
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const { state } = useSchool();
-  const [pageVisits, setPageVisits] = useState(0);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Track page visits
-    const visits = parseInt(localStorage.getItem('pageVisits') || '0');
-    const newVisits = visits + 1;
-    localStorage.setItem('pageVisits', newVisits.toString());
-    setPageVisits(newVisits);
-  }, []);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+        setLoading(false);
+      } else {
+        // User is not authenticated, redirect to login
+        navigate('/login');
+      }
+    });
 
-  const stats = [
-    {
-      title: 'Total Inquiries',
-      value: state.data.admissionInquiries.length,
-      icon: Users,
-      color: 'text-school-blue',
-      bgColor: 'bg-school-blue-light'
-    },
-    {
-      title: 'Active Notices',
-      value: state.data.notices.length,
-      icon: FileText,
-      color: 'text-school-orange',
-      bgColor: 'bg-school-orange-light'
-    },
-    {
-      title: 'Gallery Images',
-      value: state.data.galleryImages.length,
-      icon: Calendar,
-      color: 'text-school-blue',
-      bgColor: 'bg-school-blue-light'
-    },
-    {
-      title: 'Page Updates',
-      value: pageVisits,
-      icon: Eye,
-      color: 'text-school-orange',
-      bgColor: 'bg-school-orange-light'
+    return () => unsubscribe();
+  }, [navigate]);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out.",
+      });
+      navigate('/login');
+    } catch (error) {
+      toast({
+        title: "Logout Error",
+        description: "An error occurred while logging out.",
+        variant: "destructive"
+      });
     }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Shield className="h-16 w-16 text-school-blue mx-auto mb-4 animate-pulse" />
+          <p className="text-gray-600">Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const dashboardStats = [
+    { title: "Total Inquiries", value: "45", icon: Users, color: "text-school-blue" },
+    { title: "Gallery Images", value: state.data.galleryImages.length.toString(), icon: Image, color: "text-school-orange" },
+    { title: "Active Notices", value: state.data.notices.length.toString(), icon: Bell, color: "text-green-600" },
+    { title: "Page Updates", value: "12", icon: FileText, color: "text-purple-600" }
   ];
 
-  const recentInquiries = state.data.admissionInquiries.slice(0, 5);
+  const handleActivityClick = (activity: string) => {
+    switch (activity) {
+      case 'admission':
+        setActiveTab('admissions');
+        break;
+      case 'gallery':
+        setActiveTab('gallery');
+        break;
+      case 'notice':
+        setActiveTab('notices');
+        break;
+      default:
+        break;
+    }
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
+    <div className="min-h-screen bg-gray-50">
+      {/* Admin Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Shield className="h-8 w-8 text-school-blue" />
+              <div>
+                <h1 className="text-2xl font-bold text-school-blue">Admin Dashboard</h1>
+                <p className="text-gray-600">New Narayana School Management</p>
+                {user && (
+                  <p className="text-sm text-gray-500">Welcome, {user.displayName || user.email}</p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/')}
+                className="border-school-blue text-school-blue hover:bg-school-blue hover:text-white"
+              >
+                <Home className="h-4 w-4 mr-2" />
+                View Site
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={handleLogout}
+                className="border-red-500 text-red-500 hover:bg-red-50"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                  <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
-                </div>
-                <div className={`p-3 rounded-full ${stat.bgColor}`}>
-                  <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <div className="container mx-auto px-4 py-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="content">Content</TabsTrigger>
+            <TabsTrigger value="gallery">Gallery</TabsTrigger>
+            <TabsTrigger value="notices">Notices</TabsTrigger>
+            <TabsTrigger value="admissions">Admissions</TabsTrigger>
+            <TabsTrigger value="contact">Contact</TabsTrigger>
+          </TabsList>
 
-      {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Inquiries */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Admission Inquiries</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {recentInquiries.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">No recent inquiries</p>
-            ) : (
-              <div className="space-y-4">
-                {recentInquiries.map((inquiry) => (
-                  <div key={inquiry.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div>
-                      <p className="font-medium">{inquiry.studentName}</p>
-                      <p className="text-sm text-gray-600">Class: {inquiry.classApplied}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-500">{inquiry.submittedDate}</p>
-                    </div>
-                  </div>
+          <TabsContent value="overview" className="space-y-6">
+            {/* Dashboard Stats */}
+            <section>
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">Dashboard Overview</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {dashboardStats.map((stat, index) => (
+                  <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-gray-600 mb-1">{stat.title}</p>
+                          <p className="text-3xl font-bold text-gray-800">{stat.value}</p>
+                        </div>
+                        <stat.icon className={`h-12 w-12 ${stat.color}`} />
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </section>
 
-        {/* Recent Updates */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Latest Updates</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {state.data.latestUpdates.slice(0, 5).length === 0 ? (
-              <p className="text-gray-500 text-center py-4">No recent updates</p>
-            ) : (
-              <div className="space-y-4">
-                {state.data.latestUpdates.slice(0, 5).map((update) => (
-                  <div key={update.id} className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-sm">{update.content}</p>
-                    <p className="text-xs text-gray-500 mt-1">{update.date}</p>
+            {/* Recent Activity */}
+            <section>
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">Recent Activity</h2>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div 
+                      className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors"
+                      onClick={() => handleActivityClick('admission')}
+                    >
+                      <Bell className="h-5 w-5 text-school-blue" />
+                      <div>
+                        <p className="font-medium">New admission inquiry received</p>
+                        <p className="text-sm text-gray-600">2 hours ago</p>
+                      </div>
+                    </div>
+                    <div 
+                      className="flex items-center space-x-3 p-3 bg-orange-50 rounded-lg cursor-pointer hover:bg-orange-100 transition-colors"
+                      onClick={() => handleActivityClick('gallery')}
+                    >
+                      <Image className="h-5 w-5 text-school-orange" />
+                      <div>
+                        <p className="font-medium">Gallery updated with new images</p>
+                        <p className="text-sm text-gray-600">5 hours ago</p>
+                      </div>
+                    </div>
+                    <div 
+                      className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg cursor-pointer hover:bg-green-100 transition-colors"
+                      onClick={() => handleActivityClick('notice')}
+                    >
+                      <FileText className="h-5 w-5 text-green-600" />
+                      <div>
+                        <p className="font-medium">Notice board updated</p>
+                        <p className="text-sm text-gray-600">1 day ago</p>
+                      </div>
+                    </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                </CardContent>
+              </Card>
+            </section>
+          </TabsContent>
+
+          <TabsContent value="content">
+            <ContentManager />
+          </TabsContent>
+
+          <TabsContent value="gallery">
+            <GalleryManager />
+          </TabsContent>
+
+          <TabsContent value="notices">
+            <NoticeManager />
+          </TabsContent>
+
+          <TabsContent value="admissions">
+            <AdmissionManager />
+          </TabsContent>
+
+          <TabsContent value="contact">
+            <ContactManager />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

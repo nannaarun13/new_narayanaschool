@@ -14,7 +14,7 @@ const Admissions = () => {
   const [formData, setFormData] = useState({
     studentName: '',
     classApplied: '',
-    presentClass: '',
+    previousClass: '',
     previousSchool: '',
     fatherName: '',
     motherName: '',
@@ -26,12 +26,7 @@ const Admissions = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    // Convert text inputs to uppercase
-    if (name === 'studentName' || name === 'fatherName' || name === 'motherName' || name === 'previousSchool' || name === 'location') {
-      setFormData(prev => ({ ...prev, [name]: value.toUpperCase() }));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
-    }
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -69,7 +64,7 @@ const Admissions = () => {
     setFormData({
       studentName: '',
       classApplied: '',
-      presentClass: '',
+      previousClass: '',
       previousSchool: '',
       fatherName: '',
       motherName: '',
@@ -164,13 +159,13 @@ const Admissions = () => {
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="presentClass">Present Class</Label>
+                    <Label htmlFor="previousClass">Previous Class</Label>
                     <Input
-                      id="presentClass"
-                      name="presentClass"
-                      value={formData.presentClass}
+                      id="previousClass"
+                      name="previousClass"
+                      value={formData.previousClass}
                       onChange={handleInputChange}
-                      placeholder="Current class studying"
+                      placeholder="Last class attended"
                       className="border-school-blue/30 focus:border-school-blue"
                     />
                   </div>

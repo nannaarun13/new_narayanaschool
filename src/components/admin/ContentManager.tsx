@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,7 +14,6 @@ const ContentManager = () => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     schoolLogo: state.data.schoolLogo,
-    schoolName: state.data.schoolName,
     welcomeMessage: state.data.welcomeMessage,
     welcomeImage: state.data.welcomeImage,
     schoolHistory: state.data.schoolHistory,
@@ -213,17 +211,6 @@ const ContentManager = () => {
               currentImage={formData.schoolLogo}
               onImageUpload={(url) => handleImageUpload('schoolLogo', url)}
             />
-            
-            <div>
-              <Label htmlFor="schoolName">School Name</Label>
-              <Input
-                id="schoolName"
-                name="schoolName"
-                value={formData.schoolName}
-                onChange={handleInputChange}
-                placeholder="Enter school name"
-              />
-            </div>
             
             <div>
               <Label htmlFor="yearEstablished">Year Established</Label>
