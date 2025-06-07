@@ -15,6 +15,8 @@ const Login = () => {
   const { dispatch } = useSchool();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
   
   const [loginData, setLoginData] = useState({
     email: '',
@@ -101,6 +103,91 @@ const Login = () => {
     setLoading(false);
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!forgotEmail.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Email is required.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(forgotEmail)) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter a valid email address.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Simulate forgot password functionality
+    toast({
+      title: "Reset Link Sent",
+      description: "If an account with this email exists, you will receive a password reset link.",
+    });
+    
+    setShowForgotPassword(false);
+    setForgotEmail('');
+  };
+
+  if (showForgotPassword) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-school-blue-light to-school-orange-light p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <Shield className="h-16 w-16 text-school-blue mx-auto mb-4" />
+            <h1 className="text-3xl font-bold text-school-blue mb-2">Forgot Password</h1>
+            <p className="text-gray-600">Enter your email to reset your password</p>
+          </div>
+
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-2xl text-center text-school-blue">Reset Password</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleForgotPassword} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="forgotEmail">Email Address *</Label>
+                  <Input
+                    id="forgotEmail"
+                    name="forgotEmail"
+                    type="email"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    required
+                  />
+                </div>
+
+                <Button 
+                  type="submit" 
+                  className="w-full bg-school-blue hover:bg-school-blue/90 text-white py-3"
+                >
+                  Send Reset Link
+                </Button>
+              </form>
+
+              <div className="mt-6 text-center">
+                <Button 
+                  variant="link" 
+                  className="text-school-blue"
+                  onClick={() => setShowForgotPassword(false)}
+                >
+                  Back to Login
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-school-blue-light to-school-orange-light p-4">
       <div className="w-full max-w-md">
@@ -161,6 +248,16 @@ const Login = () => {
                 {loading ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
+
+            <div className="mt-4 text-center">
+              <Button 
+                variant="link" 
+                className="text-school-blue"
+                onClick={() => setShowForgotPassword(true)}
+              >
+                Forgot Password?
+              </Button>
+            </div>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">Need admin access?</p>

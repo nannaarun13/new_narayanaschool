@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 
 interface SchoolData {
@@ -58,6 +57,7 @@ interface SchoolData {
     additionalInfo: string;
     submittedDate: string;
   }>;
+  pageVisits: number;
 }
 
 interface SchoolState {
@@ -132,7 +132,8 @@ const initialState: SchoolState = {
         category: "general"
       }
     ],
-    admissionInquiries: []
+    admissionInquiries: [],
+    pageVisits: 0
   },
   isAdmin: false,
   currentUser: null
@@ -155,7 +156,8 @@ type SchoolAction =
   | { type: 'UPDATE_FOUNDER'; payload: { id: string; founder: any } }
   | { type: 'DELETE_FOUNDER'; payload: string }
   | { type: 'LOAD_PERSISTED_DATA'; payload: SchoolData }
-  | { type: 'CLEANUP_OLD_INQUIRIES' };
+  | { type: 'CLEANUP_OLD_INQUIRIES' }
+  | { type: 'INCREMENT_PAGE_VISITS' };
 
 function schoolReducer(state: SchoolState, action: SchoolAction): SchoolState {
   let newState: SchoolState;
@@ -315,6 +317,15 @@ function schoolReducer(state: SchoolState, action: SchoolAction): SchoolState {
             const inquiryDate = new Date(inquiry.submittedDate);
             return inquiryDate > sixMonthsAgo;
           })
+        }
+      };
+      break;
+    case 'INCREMENT_PAGE_VISITS':
+      newState = {
+        ...state,
+        data: {
+          ...state.data,
+          pageVisits: state.data.pageVisits + 1
         }
       };
       break;
