@@ -43,6 +43,7 @@ const AdminApprovalManager = () => {
         approvedBy: 'arunnanna3@gmail.com'
       });
 
+      // Send email verification
       await sendEmailVerification(user);
 
       // Update request status
@@ -53,13 +54,24 @@ const AdminApprovalManager = () => {
 
       toast({
         title: "Request Approved",
-        description: `Admin access granted to ${request.email}. User can now login.`,
+        description: `Admin access granted to ${request.email}. User can now login with their credentials.`,
       });
     } catch (error: any) {
       console.error('Approval error:', error);
+      let errorMessage = "Failed to approve the request. Please try again.";
+      
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = "This email is already registered. User can login directly.";
+        // Still mark as approved since user exists
+        dispatch({
+          type: 'UPDATE_ADMIN_REQUEST',
+          payload: { id: requestId, status: 'approved' }
+        });
+      }
+      
       toast({
         title: "Approval Failed",
-        description: "Failed to approve the request. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     }
@@ -119,7 +131,8 @@ const AdminApprovalManager = () => {
                       <Button
                         onClick={() => handleApproveRequest(request.id)}
                         disabled={loading === request.id}
-                        className="bg-green-600 hover:bg-green-700 text-white"
+                        className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{ opacity: loading === request.id ? 0.5 : 1 }}
                       >
                         <CheckCircle className="h-4 w-4 mr-2" />
                         {loading === request.id ? 'Approving...' : 'Approve'}
@@ -128,7 +141,8 @@ const AdminApprovalManager = () => {
                         variant="outline"
                         onClick={() => handleRejectRequest(request.id)}
                         disabled={loading === request.id}
-                        className="border-red-500 text-red-500 hover:bg-red-50"
+                        className="border-red-500 text-red-500 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{ opacity: loading === request.id ? 0.5 : 1 }}
                       >
                         <XCircle className="h-4 w-4 mr-2" />
                         Reject
