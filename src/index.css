@@ -31,13 +31,12 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
-    /* Enhanced school colors with orange accent */
-    --school-blue: 220 100% 45%;
-    --school-blue-light: 220 100% 85%;
-    --school-blue-dark: 220 100% 25%;
-    --school-orange: 25 100% 55%;
-    --school-orange-light: 25 100% 85%;
-    --school-orange-dark: 25 100% 35%;
+    /* Custom school colors */
+    --school-blue: 220 100% 50%;
+    --school-blue-light: 220 100% 90%;
+    --school-blue-dark: 220 100% 30%;
+    --school-orange: 25 100% 50%;
+    --school-orange-light: 25 100% 90%;
   }
 
   .dark {
@@ -73,26 +72,16 @@
     @apply border-border;
   }
   body {
-    @apply bg-gradient-to-br from-slate-50 to-blue-50 text-foreground;
+    @apply bg-gradient-to-br from-slate-50 to-slate-100 text-foreground;
   }
 }
 
-/* Enhanced school specific styles with orange accents */
+/* School specific styles */
 .school-gradient {
-  background: linear-gradient(135deg, hsl(var(--school-blue)) 0%, hsl(var(--school-blue-dark)) 70%, hsl(var(--school-orange)) 100%);
+  background: linear-gradient(135deg, hsl(var(--school-blue)) 0%, hsl(var(--school-blue-dark)) 100%);
 }
 
-/* Orange accent buttons and interactive elements */
-.btn-orange, .orange-accent {
-  background: linear-gradient(135deg, hsl(var(--school-orange)) 0%, hsl(var(--school-orange-dark)) 100%);
-  color: white;
-}
-
-.btn-orange:hover, .orange-accent:hover {
-  background: linear-gradient(135deg, hsl(var(--school-orange-dark)) 0%, hsl(var(--school-orange)) 100%);
-}
-
-/* Enhanced button visibility and interactions */
+/* Ensure buttons maintain visibility */
 .btn, button {
   transition: all 0.2s ease-in-out !important;
 }
@@ -130,17 +119,4 @@ button:not(:disabled):active {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-}
-
-/* Orange accent for links and highlights */
-.text-accent {
-  color: hsl(var(--school-orange));
-}
-
-.bg-accent {
-  background-color: hsl(var(--school-orange-light));
-}
-
-.border-accent {
-  border-color: hsl(var(--school-orange));
 }
