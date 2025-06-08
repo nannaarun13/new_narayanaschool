@@ -171,7 +171,7 @@ type SchoolAction =
   | { type: 'UPDATE_FOUNDER'; payload: { id: string; founder: any } }
   | { type: 'DELETE_FOUNDER'; payload: string }
   | { type: 'ADD_ADMIN_REQUEST'; payload: any }
-  | { type: 'UPDATE_ADMIN_REQUEST'; payload: { id: string; status: string } }
+  | { type: 'UPDATE_ADMIN_REQUEST'; payload: { id: string; status: 'pending' | 'approved' | 'rejected' } }
   | { type: 'LOAD_PERSISTED_DATA'; payload: SchoolData }
   | { type: 'CLEANUP_OLD_INQUIRIES' };
 
