@@ -9,6 +9,19 @@ const Gallery = () => {
   const { state } = useSchool();
   const { galleryImages } = state.data;
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+
+  const categories = [
+    { value: 'all', label: 'All' },
+    { value: 'general', label: 'General' },
+    { value: 'event', label: 'Event' },
+    { value: 'festivals', label: 'Festivals' },
+    { value: 'activities', label: 'Activities' }
+  ];
+
+  const filteredImages = selectedCategory === 'all' 
+    ? galleryImages 
+    : galleryImages.filter(image => image.category === selectedCategory);
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
@@ -22,28 +35,54 @@ const Gallery = () => {
         </p>
       </section>
 
-      {/* Gallery Grid */}
+      {/* Category Filter */}
       <section className="animate-fade-in">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {galleryImages.map((image) => (
-            <Card 
-              key={image.id} 
-              className="overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
-              onClick={() => setSelectedImage(image.url)}
+        <div className="flex flex-wrap justify-center gap-4 mb-8">
+          {categories.map((category) => (
+            <Button
+              key={category.value}
+              variant={selectedCategory === category.value ? "default" : "outline"}
+              onClick={() => setSelectedCategory(category.value)}
+              className={selectedCategory === category.value 
+                ? "bg-school-blue hover:bg-school-blue/90" 
+                : "border-school-blue text-school-blue hover:bg-school-blue hover:text-white"
+              }
             >
-              <div className="h-48 overflow-hidden">
-                <img
-                  src={image.url}
-                  alt={image.caption}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <CardContent className="p-4">
-                <p className="text-sm text-gray-600">{image.caption}</p>
-              </CardContent>
-            </Card>
+              {category.label}
+            </Button>
           ))}
         </div>
+      </section>
+
+      {/* Gallery Grid */}
+      <section className="animate-fade-in">
+        {filteredImages.length > 0 ? (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredImages.map((image) => (
+              <Card 
+                key={image.id} 
+                className="overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+                onClick={() => setSelectedImage(image.url)}
+              >
+                <div className="h-48 overflow-hidden">
+                  <img
+                    src={image.url}
+                    alt={image.caption}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <CardContent className="p-4">
+                  <p className="text-sm text-gray-600 font-medium">{image.caption}</p>
+                  <p className="text-xs text-gray-500 mt-1 capitalize">{image.category}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">No images found in this category.</p>
+          </div>
+        )}
       </section>
 
       {/* Image Modal */}

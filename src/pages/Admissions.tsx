@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useSchool } from '@/contexts/SchoolContext';
+import { GraduationCap, Users, BookOpen, Award } from 'lucide-react';
 
 const Admissions = () => {
   const { toast } = useToast();
@@ -14,7 +15,7 @@ const Admissions = () => {
   const [formData, setFormData] = useState({
     studentName: '',
     classApplied: '',
-    previousClass: '',
+    presentClass: '',
     previousSchool: '',
     fatherName: '',
     motherName: '',
@@ -26,24 +27,30 @@ const Admissions = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Convert text fields to uppercase
+    if (['studentName', 'fatherName', 'motherName', 'previousSchool', 'location'].includes(name)) {
+      setFormData(prev => ({ ...prev, [name]: value.toUpperCase() }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     // Basic validation
-    if (!formData.studentName || !formData.classApplied || !formData.fatherName || !formData.primaryContact) {
+    if (!formData.studentName || !formData.classApplied || !formData.presentClass || !formData.fatherName || !formData.motherName || !formData.primaryContact) {
       toast({
-        title: "Validation Error",
+        title: "Missing Information",
         description: "Please fill in all required fields.",
         variant: "destructive"
       });
       return;
     }
 
-    // Create admission inquiry object
-    const admissionInquiry = {
+    // Create inquiry object
+    const inquiry = {
       id: Date.now().toString(),
       ...formData,
       submittedDate: new Date().toISOString().split('T')[0]
@@ -52,19 +59,19 @@ const Admissions = () => {
     // Add to context
     dispatch({
       type: 'ADD_ADMISSION_INQUIRY',
-      payload: admissionInquiry
+      payload: inquiry
     });
-    
+
     toast({
-      title: "Application Submitted!",
-      description: "Thank you for your admission inquiry. We will contact you soon.",
+      title: "Application Submitted",
+      description: "Your admission inquiry has been submitted successfully. We will contact you soon.",
     });
 
     // Reset form
     setFormData({
       studentName: '',
       classApplied: '',
-      previousClass: '',
+      presentClass: '',
       previousSchool: '',
       fatherName: '',
       motherName: '',
@@ -75,6 +82,29 @@ const Admissions = () => {
     });
   };
 
+  const admissionHighlights = [
+    {
+      icon: GraduationCap,
+      title: "Quality Education",
+      description: "Comprehensive curriculum designed for holistic development"
+    },
+    {
+      icon: Users,
+      title: "Experienced Faculty",
+      description: "Dedicated teachers committed to student success"
+    },
+    {
+      icon: BookOpen,
+      title: "Modern Facilities",
+      description: "Well-equipped classrooms and laboratories"
+    },
+    {
+      icon: Award,
+      title: "Excellence Record",
+      description: "Proven track record of academic achievements"
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-school-white">
       <div className="container mx-auto px-4 py-8 space-y-12">
@@ -84,106 +114,88 @@ const Admissions = () => {
             Admissions
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Join our school community and embark on a journey of academic excellence
+            Join our community of learners and embark on a journey of academic excellence
           </p>
         </section>
 
-        {/* Admission Information */}
+        {/* Admission Highlights */}
         <section className="animate-fade-in">
-          <Card className="hover:shadow-lg transition-shadow duration-300 border-school-blue/20">
-            <CardHeader className="bg-school-blue-light">
-              <CardTitle className="text-3xl text-school-blue">Admission Process</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-school-blue text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                    1
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Submit Inquiry</h3>
-                  <p className="text-gray-600">Fill out the admission inquiry form below</p>
-                </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-school-orange text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                    2
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Document Review</h3>
-                  <p className="text-gray-600">Our team will review your application</p>
-                </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-school-blue text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
-                    3
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">Admission Confirmation</h3>
-                  <p className="text-gray-600">Receive confirmation and next steps</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {admissionHighlights.map((highlight, index) => (
+              <Card key={index} className="text-center hover:shadow-lg transition-shadow duration-300">
+                <CardContent className="p-6">
+                  <highlight.icon className="h-12 w-12 text-school-blue mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-school-blue mb-2">{highlight.title}</h3>
+                  <p className="text-gray-600 text-sm">{highlight.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </section>
 
         {/* Admission Form */}
         <section className="animate-fade-in">
-          <Card className="hover:shadow-lg transition-shadow duration-300 border-school-orange/20">
-            <CardHeader className="bg-school-orange-light">
-              <CardTitle className="text-3xl text-school-blue">Admission Inquiry Form</CardTitle>
+          <Card className="max-w-4xl mx-auto">
+            <CardHeader className="bg-school-blue-light">
+              <CardTitle className="text-2xl text-school-blue text-center">
+                Admission Inquiry Form
+              </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="studentName">Student's Name *</Label>
+                  <div>
+                    <Label htmlFor="studentName">Student Name *</Label>
                     <Input
                       id="studentName"
                       name="studentName"
                       value={formData.studentName}
                       onChange={handleInputChange}
-                      placeholder="Enter student's full name"
+                      placeholder="Enter student name"
                       required
-                      className="border-school-blue/30 focus:border-school-blue"
                     />
+                    <p className="text-xs text-gray-500 mt-1">Will be converted to uppercase</p>
                   </div>
-                  <div className="space-y-2">
+                  <div>
                     <Label htmlFor="classApplied">Class Applied For *</Label>
                     <Input
                       id="classApplied"
                       name="classApplied"
                       value={formData.classApplied}
                       onChange={handleInputChange}
-                      placeholder="e.g., Class 1, Class 10"
+                      placeholder="e.g., Class 5, Class 10"
                       required
-                      className="border-school-blue/30 focus:border-school-blue"
                     />
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="previousClass">Previous Class</Label>
+                  <div>
+                    <Label htmlFor="presentClass">Present Class *</Label>
                     <Input
-                      id="previousClass"
-                      name="previousClass"
-                      value={formData.previousClass}
+                      id="presentClass"
+                      name="presentClass"
+                      value={formData.presentClass}
                       onChange={handleInputChange}
-                      placeholder="Last class attended"
-                      className="border-school-blue/30 focus:border-school-blue"
+                      placeholder="Current class of the student"
+                      required
                     />
                   </div>
-                  <div className="space-y-2">
+                  <div>
                     <Label htmlFor="previousSchool">Previous School</Label>
                     <Input
                       id="previousSchool"
                       name="previousSchool"
                       value={formData.previousSchool}
                       onChange={handleInputChange}
-                      placeholder="Name of previous school"
-                      className="border-school-blue/30 focus:border-school-blue"
+                      placeholder="Enter previous school name"
                     />
+                    <p className="text-xs text-gray-500 mt-1">Will be converted to uppercase</p>
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
+                  <div>
                     <Label htmlFor="fatherName">Father's Name *</Label>
                     <Input
                       id="fatherName"
@@ -192,63 +204,60 @@ const Admissions = () => {
                       onChange={handleInputChange}
                       placeholder="Enter father's name"
                       required
-                      className="border-school-blue/30 focus:border-school-blue"
                     />
+                    <p className="text-xs text-gray-500 mt-1">Will be converted to uppercase</p>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="motherName">Mother's Name</Label>
+                  <div>
+                    <Label htmlFor="motherName">Mother's Name *</Label>
                     <Input
                       id="motherName"
                       name="motherName"
                       value={formData.motherName}
                       onChange={handleInputChange}
                       placeholder="Enter mother's name"
-                      className="border-school-blue/30 focus:border-school-blue"
+                      required
                     />
+                    <p className="text-xs text-gray-500 mt-1">Will be converted to uppercase</p>
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
+                  <div>
                     <Label htmlFor="primaryContact">Primary Contact Number *</Label>
                     <Input
                       id="primaryContact"
                       name="primaryContact"
-                      type="tel"
                       value={formData.primaryContact}
                       onChange={handleInputChange}
-                      placeholder="+91 98765 43210"
+                      placeholder="Enter primary contact number"
                       required
-                      className="border-school-blue/30 focus:border-school-blue"
                     />
                   </div>
-                  <div className="space-y-2">
+                  <div>
                     <Label htmlFor="secondaryContact">Secondary Contact Number</Label>
                     <Input
                       id="secondaryContact"
                       name="secondaryContact"
-                      type="tel"
                       value={formData.secondaryContact}
                       onChange={handleInputChange}
-                      placeholder="+91 98765 43210"
-                      className="border-school-blue/30 focus:border-school-blue"
+                      placeholder="Enter secondary contact number"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="location">Location/Address</Label>
+                <div>
+                  <Label htmlFor="location">Location</Label>
                   <Input
                     id="location"
                     name="location"
                     value={formData.location}
                     onChange={handleInputChange}
                     placeholder="Enter your location/address"
-                    className="border-school-blue/30 focus:border-school-blue"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Will be converted to uppercase</p>
                 </div>
 
-                <div className="space-y-2">
+                <div>
                   <Label htmlFor="additionalInfo">Additional Information</Label>
                   <Textarea
                     id="additionalInfo"
@@ -257,14 +266,10 @@ const Admissions = () => {
                     onChange={handleInputChange}
                     placeholder="Any additional information you'd like to share"
                     rows={4}
-                    className="border-school-blue/30 focus:border-school-blue"
                   />
                 </div>
 
-                <Button 
-                  type="submit" 
-                  className="w-full bg-school-blue hover:bg-school-blue/90 text-white py-3 text-lg"
-                >
+                <Button type="submit" className="w-full bg-school-blue hover:bg-school-blue/90 text-white py-3">
                   Submit Admission Inquiry
                 </Button>
               </form>

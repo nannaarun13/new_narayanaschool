@@ -6,9 +6,7 @@ const About = () => {
   const { state } = useSchool();
   const { 
     schoolHistory, 
-    yearEstablished, 
-    educationalSociety, 
-    founderDetails = [] // Default to empty array if undefined
+    founderDetails = []
   } = state.data;
 
   return (
@@ -30,28 +28,8 @@ const About = () => {
             <CardTitle className="text-3xl text-school-blue">Our History</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="text-center mb-6">
-              <div className="text-4xl font-bold text-school-orange mb-2">
-                {yearEstablished}
-              </div>
-              <p className="text-gray-600">Year Established</p>
-            </div>
             <p className="text-lg text-gray-700 leading-relaxed">
               {schoolHistory}
-            </p>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Educational Society */}
-      <section className="animate-fade-in">
-        <Card className="hover:shadow-lg transition-shadow duration-300">
-          <CardHeader>
-            <CardTitle className="text-3xl text-school-blue">Educational Society</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg text-gray-700 leading-relaxed">
-              {educationalSociety}
             </p>
           </CardContent>
         </Card>

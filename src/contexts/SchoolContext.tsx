@@ -4,6 +4,7 @@ import React, { createContext, useContext, useReducer, useEffect, ReactNode } fr
 interface SchoolData {
   schoolName: string;
   schoolLogo: string;
+  schoolNameImage?: string;
   welcomeMessage: string;
   welcomeImage: string;
   latestUpdates: Array<{
@@ -24,6 +25,7 @@ interface SchoolData {
     address: string;
     email: string;
     phone: string;
+    phoneNumbers: string[];
     mapEmbed: string;
   };
   navigationItems: Array<{
@@ -41,13 +43,14 @@ interface SchoolData {
     id: string;
     url: string;
     caption: string;
+    category: string;
     date: string;
   }>;
   admissionInquiries: Array<{
     id: string;
     studentName: string;
     classApplied: string;
-    previousClass: string;
+    presentClass: string;
     previousSchool: string;
     fatherName: string;
     motherName: string;
@@ -57,6 +60,17 @@ interface SchoolData {
     additionalInfo: string;
     submittedDate: string;
   }>;
+  adminRequests?: Array<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    password: string;
+    requestDate: string;
+    status: 'pending' | 'approved' | 'rejected';
+  }>;
+  pageVisits?: number;
 }
 
 interface SchoolState {
@@ -67,7 +81,7 @@ interface SchoolState {
 
 const initialState: SchoolState = {
   data: {
-    schoolName: "",
+    schoolName: "New Narayana School",
     schoolLogo: "/placeholder.svg",
     welcomeMessage: "Welcome to New Narayana School - Nurturing Excellence in Education",
     welcomeImage: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1",
@@ -88,8 +102,8 @@ const initialState: SchoolState = {
         date: "2024-01-13"
       }
     ],
-    schoolHistory: "Established in 1995, New Narayana School has been a beacon of quality education, fostering academic excellence and character development.",
-    yearEstablished: "1995",
+    schoolHistory: "Established in 2023, New Narayana School has been a beacon of quality education, fostering academic excellence and character development.",
+    yearEstablished: "2023",
     educationalSociety: "Narayana Educational Society has been dedicated to promoting quality education and holistic development of students across the region.",
     founderDetails: [
       {
@@ -100,10 +114,11 @@ const initialState: SchoolState = {
       }
     ],
     contactInfo: {
-      address: "123 Education Street, Knowledge City, State - 123456",
+      address: "8G49+HFJ, Sri Laxmi Nagar Colony, Badangpet, Hyderabad, Telangana 500058",
       email: "info@newnarayanaschool.edu",
       phone: "+91 98765 43210",
-      mapEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3024.123456789!2d-74.123456789!3d40.123456789!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x123456789abcdef%3A0x123456789abcdef!2sSchool!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus"
+      phoneNumbers: ["+91 98765 43210"],
+      mapEmbed: "https://www.google.com/maps/embed/v1/search?q=8G49%2BHFJ%2C%20Sri%20Laxmi%20Nagar%20Colony%2C%20Badangpet%2C%20Hyderabad%2C%20Telangana%20500058&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"
     },
     navigationItems: [
       { name: "Home", path: "/", visible: true },
@@ -127,10 +142,13 @@ const initialState: SchoolState = {
         id: "1",
         url: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1",
         caption: "School Building",
+        category: "general",
         date: "2024-01-01"
       }
     ],
-    admissionInquiries: []
+    admissionInquiries: [],
+    adminRequests: [],
+    pageVisits: 0
   },
   isAdmin: false,
   currentUser: null
@@ -152,6 +170,8 @@ type SchoolAction =
   | { type: 'ADD_FOUNDER'; payload: any }
   | { type: 'UPDATE_FOUNDER'; payload: { id: string; founder: any } }
   | { type: 'DELETE_FOUNDER'; payload: string }
+  | { type: 'ADD_ADMIN_REQUEST'; payload: any }
+  | { type: 'UPDATE_ADMIN_REQUEST'; payload: { id: string; status: string } }
   | { type: 'LOAD_PERSISTED_DATA'; payload: SchoolData }
   | { type: 'CLEANUP_OLD_INQUIRIES' };
 
@@ -298,6 +318,26 @@ function schoolReducer(state: SchoolState, action: SchoolAction): SchoolState {
         data: {
           ...state.data,
           founderDetails: state.data.founderDetails.filter(founder => founder.id !== action.payload)
+        }
+      };
+      break;
+    case 'ADD_ADMIN_REQUEST':
+      newState = {
+        ...state,
+        data: {
+          ...state.data,
+          adminRequests: [action.payload, ...(state.data.adminRequests || [])]
+        }
+      };
+      break;
+    case 'UPDATE_ADMIN_REQUEST':
+      newState = {
+        ...state,
+        data: {
+          ...state.data,
+          adminRequests: (state.data.adminRequests || []).map(request =>
+            request.id === action.payload.id ? { ...request, status: action.payload.status } : request
+          )
         }
       };
       break;

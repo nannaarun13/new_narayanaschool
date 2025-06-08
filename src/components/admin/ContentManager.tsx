@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,66 +7,80 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useSchool } from '@/contexts/SchoolContext';
 import { useToast } from '@/hooks/use-toast';
-import { Save, Plus, Edit, Trash2, X } from 'lucide-react';
+import { Save, Plus, Trash2 } from 'lucide-react';
 import ImageUpload from './ImageUpload';
 
 const ContentManager = () => {
   const { state, dispatch } = useSchool();
   const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    schoolLogo: state.data.schoolLogo,
+  const [activeSection, setActiveSection] = useState('general');
+
+  // General content
+  const [generalData, setGeneralData] = useState({
+    schoolName: state.data.schoolName,
     welcomeMessage: state.data.welcomeMessage,
-    welcomeImage: state.data.welcomeImage,
-    schoolHistory: state.data.schoolHistory,
-    yearEstablished: state.data.yearEstablished,
-    educationalSociety: state.data.educationalSociety
+    schoolHistory: state.data.schoolHistory
   });
 
-  // Latest Updates management
+  // Latest updates
   const [newUpdate, setNewUpdate] = useState({ content: '' });
-  const [editingUpdate, setEditingUpdate] = useState<string | null>(null);
-  const [editUpdateData, setEditUpdateData] = useState({ content: '' });
 
-  // Founder management
-  const [newFounder, setNewFounder] = useState({ name: '', description: '', image: '' });
-  const [editingFounder, setEditingFounder] = useState<string | null>(null);
-  const [editFounderData, setEditFounderData] = useState({ name: '', description: '', image: '' });
+  // Founder details
+  const [newFounder, setNewFounder] = useState({
+    name: '',
+    description: '',
+    image: ''
+  });
 
-  // Safe access to founderDetails with fallback
-  const founderDetails = Array.isArray(state.data.founderDetails) ? state.data.founderDetails : [];
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleGeneralChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setGeneralData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleImageUpload = (field: string, imageUrl: string) => {
-    setFormData(prev => ({ ...prev, [field]: imageUrl }));
-  };
-
-  const handleSave = () => {
+  const handleSaveGeneral = () => {
     dispatch({
       type: 'UPDATE_SCHOOL_DATA',
-      payload: formData
+      payload: generalData
     });
     toast({
       title: "Content Updated",
-      description: "School content has been updated successfully.",
+      description: "General content has been updated successfully.",
     });
   };
 
-  // Latest Updates functions
+  const handleSchoolNameImageUpload = (imageUrl: string) => {
+    dispatch({
+      type: 'UPDATE_SCHOOL_DATA',
+      payload: { schoolNameImage: imageUrl }
+    });
+    toast({
+      title: "School Name Image Updated",
+      description: "School name image has been updated successfully.",
+    });
+  };
+
+  const handleWelcomeImageUpload = (imageUrl: string) => {
+    dispatch({
+      type: 'UPDATE_SCHOOL_DATA',
+      payload: { welcomeImage: imageUrl }
+    });
+    toast({
+      title: "Welcome Image Updated",
+      description: "Welcome section image has been updated successfully.",
+    });
+  };
+
   const handleAddUpdate = () => {
-    if (!newUpdate.content) {
+    if (!newUpdate.content.trim()) {
       toast({
-        title: "Missing Information",
-        description: "Please provide update content.",
+        title: "Missing Content",
+        description: "Please enter update content.",
         variant: "destructive"
       });
       return;
     }
 
-    const updateData = {
+    const update = {
       id: Date.now().toString(),
       content: newUpdate.content,
       date: new Date().toISOString().split('T')[0]
@@ -73,41 +88,13 @@ const ContentManager = () => {
 
     dispatch({
       type: 'ADD_LATEST_UPDATE',
-      payload: updateData
+      payload: update
     });
 
     setNewUpdate({ content: '' });
     toast({
       title: "Update Added",
-      description: "New update has been added.",
-    });
-  };
-
-  const handleEditUpdate = (update: any) => {
-    setEditingUpdate(update.id);
-    setEditUpdateData({ content: update.content });
-  };
-
-  const handleSaveUpdateEdit = () => {
-    if (!editUpdateData.content) {
-      toast({
-        title: "Missing Information",
-        description: "Please provide update content.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    dispatch({
-      type: 'UPDATE_LATEST_UPDATE',
-      payload: { id: editingUpdate, update: editUpdateData }
-    });
-
-    setEditingUpdate(null);
-    setEditUpdateData({ content: '' });
-    toast({
-      title: "Update Modified",
-      description: "Update has been modified successfully.",
+      description: "Latest update has been added successfully.",
     });
   };
 
@@ -118,63 +105,38 @@ const ContentManager = () => {
     });
     toast({
       title: "Update Deleted",
-      description: "Update has been removed.",
+      description: "Update has been removed successfully.",
     });
   };
 
-  // Founder functions
+  const handleFounderImageUpload = (imageUrl: string) => {
+    setNewFounder(prev => ({ ...prev, image: imageUrl }));
+  };
+
   const handleAddFounder = () => {
     if (!newFounder.name || !newFounder.description || !newFounder.image) {
       toast({
         title: "Missing Information",
-        description: "Please provide name, description, and image.",
+        description: "Please fill all founder details and upload an image.",
         variant: "destructive"
       });
       return;
     }
 
-    const founderData = {
+    const founder = {
       id: Date.now().toString(),
       ...newFounder
     };
 
     dispatch({
       type: 'ADD_FOUNDER',
-      payload: founderData
+      payload: founder
     });
 
     setNewFounder({ name: '', description: '', image: '' });
     toast({
       title: "Founder Added",
-      description: "New founder has been added.",
-    });
-  };
-
-  const handleEditFounder = (founder: any) => {
-    setEditingFounder(founder.id);
-    setEditFounderData({ name: founder.name, description: founder.description, image: founder.image });
-  };
-
-  const handleSaveFounderEdit = () => {
-    if (!editFounderData.name || !editFounderData.description || !editFounderData.image) {
-      toast({
-        title: "Missing Information",
-        description: "Please provide name, description, and image.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    dispatch({
-      type: 'UPDATE_FOUNDER',
-      payload: { id: editingFounder, founder: editFounderData }
-    });
-
-    setEditingFounder(null);
-    setEditFounderData({ name: '', description: '', image: '' });
-    toast({
-      title: "Founder Updated",
-      description: "Founder has been updated successfully.",
+      description: "Founder details have been added successfully.",
     });
   };
 
@@ -185,7 +147,7 @@ const ContentManager = () => {
     });
     toast({
       title: "Founder Deleted",
-      description: "Founder has been removed.",
+      description: "Founder has been removed successfully.",
     });
   };
 
@@ -193,264 +155,223 @@ const ContentManager = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-800">Content Management</h2>
-        <Button onClick={handleSave} className="bg-school-blue hover:bg-school-blue/90">
-          <Save className="h-4 w-4 mr-2" />
-          Save Changes
+      </div>
+
+      {/* Section Tabs */}
+      <div className="flex space-x-2 border-b">
+        <Button
+          variant={activeSection === 'general' ? 'default' : 'ghost'}
+          onClick={() => setActiveSection('general')}
+        >
+          General Content
+        </Button>
+        <Button
+          variant={activeSection === 'updates' ? 'default' : 'ghost'}
+          onClick={() => setActiveSection('updates')}
+        >
+          Latest Updates
+        </Button>
+        <Button
+          variant={activeSection === 'founders' ? 'default' : 'ghost'}
+          onClick={() => setActiveSection('founders')}
+        >
+          Founders
         </Button>
       </div>
 
-      <div className="grid gap-6">
-        {/* School Basic Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle>School Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <ImageUpload
-              label="School Logo"
-              currentImage={formData.schoolLogo}
-              onImageUpload={(url) => handleImageUpload('schoolLogo', url)}
-            />
-            
-            <div>
-              <Label htmlFor="yearEstablished">Year Established</Label>
-              <Input
-                id="yearEstablished"
-                name="yearEstablished"
-                value={formData.yearEstablished}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div>
-              <Label htmlFor="educationalSociety">Educational Society</Label>
-              <Textarea
-                id="educationalSociety"
-                name="educationalSociety"
-                value={formData.educationalSociety}
-                onChange={handleInputChange}
-                rows={3}
-              />
-            </div>
-          </CardContent>
-        </Card>
+      {/* General Content */}
+      {activeSection === 'general' && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                General Information
+                <Button onClick={handleSaveGeneral} className="bg-school-blue hover:bg-school-blue/90">
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Changes
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="schoolName">School Name</Label>
+                <Input
+                  id="schoolName"
+                  name="schoolName"
+                  value={generalData.schoolName}
+                  onChange={handleGeneralChange}
+                />
+              </div>
 
-        {/* Welcome Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Welcome Section</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="welcomeMessage">Welcome Message</Label>
-              <Textarea
-                id="welcomeMessage"
-                name="welcomeMessage"
-                value={formData.welcomeMessage}
-                onChange={handleInputChange}
-                rows={3}
-              />
-            </div>
-            
-            <ImageUpload
-              label="Welcome Image"
-              currentImage={formData.welcomeImage}
-              onImageUpload={(url) => handleImageUpload('welcomeImage', url)}
-            />
-          </CardContent>
-        </Card>
+              <div>
+                <ImageUpload
+                  label="School Name Image (replaces text header)"
+                  currentImage={state.data.schoolNameImage}
+                  onImageUpload={handleSchoolNameImageUpload}
+                />
+              </div>
 
-        {/* About Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>About Us Content</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="schoolHistory">School History</Label>
-              <Textarea
-                id="schoolHistory"
-                name="schoolHistory"
-                value={formData.schoolHistory}
-                onChange={handleInputChange}
-                rows={4}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Latest Updates Management */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Latest Updates</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Add New Update */}
-            <div className="border rounded-lg p-4 bg-gray-50">
-              <h4 className="font-semibold mb-3">Add New Update</h4>
-              <div className="space-y-3">
+              <div>
+                <Label htmlFor="welcomeMessage">Welcome Message</Label>
                 <Textarea
+                  id="welcomeMessage"
+                  name="welcomeMessage"
+                  value={generalData.welcomeMessage}
+                  onChange={handleGeneralChange}
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <ImageUpload
+                  label="Welcome Section Image"
+                  currentImage={state.data.welcomeImage}
+                  onImageUpload={handleWelcomeImageUpload}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="schoolHistory">School History</Label>
+                <Textarea
+                  id="schoolHistory"
+                  name="schoolHistory"
+                  value={generalData.schoolHistory}
+                  onChange={handleGeneralChange}
+                  rows={4}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Latest Updates */}
+      {activeSection === 'updates' && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Add New Update</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="updateContent">Update Content</Label>
+                <Textarea
+                  id="updateContent"
                   value={newUpdate.content}
                   onChange={(e) => setNewUpdate({ content: e.target.value })}
-                  placeholder="Enter update content"
-                  rows={2}
+                  placeholder="Enter the latest update"
+                  rows={3}
                 />
-                <Button onClick={handleAddUpdate} size="sm" className="bg-school-blue hover:bg-school-blue/90">
-                  <Plus className="h-4 w-4 mr-1" />
-                  Add Update
-                </Button>
               </div>
-            </div>
+              <Button onClick={handleAddUpdate} className="bg-school-blue hover:bg-school-blue/90">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Update
+              </Button>
+            </CardContent>
+          </Card>
 
-            {/* Current Updates */}
-            <div className="space-y-3">
-              {state.data.latestUpdates.map((update) => (
-                <div key={update.id} className="border rounded-lg p-3">
-                  {editingUpdate === update.id ? (
-                    <div className="space-y-3">
-                      <Textarea
-                        value={editUpdateData.content}
-                        onChange={(e) => setEditUpdateData({ content: e.target.value })}
-                        rows={2}
-                      />
-                      <div className="flex space-x-2">
-                        <Button onClick={handleSaveUpdateEdit} size="sm" className="bg-green-600 hover:bg-green-700">
-                          <Save className="h-4 w-4 mr-1" />
-                          Save
-                        </Button>
-                        <Button onClick={() => setEditingUpdate(null)} variant="outline" size="sm">
-                          <X className="h-4 w-4 mr-1" />
-                          Cancel
-                        </Button>
-                      </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Current Updates</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {state.data.latestUpdates.map((update) => (
+                  <div key={update.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <p className="font-medium">{update.content}</p>
+                      <p className="text-sm text-gray-600">{update.date}</p>
                     </div>
-                  ) : (
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <p className="text-gray-700">{update.content}</p>
-                        <p className="text-sm text-gray-500 mt-1">Posted on {update.date}</p>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeleteUpdate(update.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Founders */}
+      {activeSection === 'founders' && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Add New Founder</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="founderName">Founder Name</Label>
+                <Input
+                  id="founderName"
+                  value={newFounder.name}
+                  onChange={(e) => setNewFounder(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Enter founder name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="founderDescription">Description</Label>
+                <Textarea
+                  id="founderDescription"
+                  value={newFounder.description}
+                  onChange={(e) => setNewFounder(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Enter founder description"
+                  rows={3}
+                />
+              </div>
+              <ImageUpload
+                label="Founder Image"
+                currentImage={newFounder.image}
+                onImageUpload={handleFounderImageUpload}
+              />
+              <Button onClick={handleAddFounder} className="bg-school-blue hover:bg-school-blue/90">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Founder
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Current Founders</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                {state.data.founderDetails.map((founder) => (
+                  <div key={founder.id} className="border rounded-lg p-4">
+                    <div className="grid md:grid-cols-4 gap-4 items-center">
+                      <img
+                        src={founder.image}
+                        alt={founder.name}
+                        className="w-full h-24 object-cover rounded"
+                      />
+                      <div className="md:col-span-2">
+                        <h3 className="font-semibold">{founder.name}</h3>
+                        <p className="text-sm text-gray-600 mt-1">{founder.description}</p>
                       </div>
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="sm" onClick={() => handleEditUpdate(update)}>
-                          <Edit className="h-4 w-4" />
-                        </Button>
+                      <div className="flex justify-end">
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => handleDeleteUpdate(update.id)}
+                          onClick={() => handleDeleteFounder(founder.id)}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4 mr-1" />
+                          Delete
                         </Button>
                       </div>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Founders Management */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Founders Management</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Add New Founder */}
-            <div className="border rounded-lg p-4 bg-gray-50">
-              <h4 className="font-semibold mb-3">Add New Founder</h4>
-              <div className="space-y-3">
-                <Input
-                  value={newFounder.name}
-                  onChange={(e) => setNewFounder(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Founder name"
-                />
-                <Textarea
-                  value={newFounder.description}
-                  onChange={(e) => setNewFounder(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Founder description"
-                  rows={3}
-                />
-                <ImageUpload
-                  label="Founder Image"
-                  currentImage={newFounder.image}
-                  onImageUpload={(url) => setNewFounder(prev => ({ ...prev, image: url }))}
-                />
-                <Button onClick={handleAddFounder} size="sm" className="bg-school-blue hover:bg-school-blue/90">
-                  <Plus className="h-4 w-4 mr-1" />
-                  Add Founder
-                </Button>
-              </div>
-            </div>
-
-            {/* Current Founders */}
-            <div className="space-y-4">
-              {founderDetails.length > 0 ? (
-                founderDetails.map((founder) => (
-                  <div key={founder.id} className="border rounded-lg p-4">
-                    {editingFounder === founder.id ? (
-                      <div className="space-y-4">
-                        <Input
-                          value={editFounderData.name}
-                          onChange={(e) => setEditFounderData(prev => ({ ...prev, name: e.target.value }))}
-                          placeholder="Founder name"
-                        />
-                        <Textarea
-                          value={editFounderData.description}
-                          onChange={(e) => setEditFounderData(prev => ({ ...prev, description: e.target.value }))}
-                          rows={3}
-                        />
-                        <ImageUpload
-                          label="Founder Image"
-                          currentImage={editFounderData.image}
-                          onImageUpload={(url) => setEditFounderData(prev => ({ ...prev, image: url }))}
-                        />
-                        <div className="flex space-x-2">
-                          <Button onClick={handleSaveFounderEdit} size="sm" className="bg-green-600 hover:bg-green-700">
-                            <Save className="h-4 w-4 mr-1" />
-                            Save
-                          </Button>
-                          <Button onClick={() => setEditingFounder(null)} variant="outline" size="sm">
-                            <X className="h-4 w-4 mr-1" />
-                            Cancel
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-start justify-between">
-                        <div className="flex space-x-4 flex-1">
-                          <img
-                            src={founder.image}
-                            alt={founder.name}
-                            className="w-16 h-16 object-cover rounded"
-                          />
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-lg">{founder.name}</h3>
-                            <p className="text-gray-600 mt-1">{founder.description}</p>
-                          </div>
-                        </div>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm" onClick={() => handleEditFounder(founder)}>
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDeleteFounder(founder.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    )}
                   </div>
-                ))
-              ) : (
-                <p className="text-gray-500 text-center py-4">No founders added yet. Add your first founder above.</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };

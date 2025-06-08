@@ -12,7 +12,8 @@ import {
   Phone,
   Shield,
   Home,
-  LogOut
+  LogOut,
+  UserCheck
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
@@ -24,14 +25,16 @@ import GalleryManager from '@/components/admin/GalleryManager';
 import NoticeManager from '@/components/admin/NoticeManager';
 import AdmissionManager from '@/components/admin/AdmissionManager';
 import ContactManager from '@/components/admin/ContactManager';
+import AdminApprovalManager from '@/components/admin/AdminApprovalManager';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { state } = useSchool();
+  const { state, dispatch } = useSchool();
   const [activeTab, setActiveTab] = useState('overview');
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [pageVisits] = useState(Math.floor(Math.random() * 1000) + 500); // Simulated page visits
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -39,13 +42,21 @@ const AdminDashboard = () => {
         setUser(currentUser);
         setLoading(false);
       } else {
-        // User is not authenticated, redirect to login
+        // Check for auto-login
         navigate('/login');
       }
     });
 
     return () => unsubscribe();
   }, [navigate]);
+
+  // Simulate page visits counter (in real app, this would come from analytics)
+  useEffect(() => {
+    dispatch({
+      type: 'UPDATE_SCHOOL_DATA',
+      payload: { pageVisits }
+    });
+  }, [dispatch, pageVisits]);
 
   const handleLogout = async () => {
     try {
@@ -76,10 +87,30 @@ const AdminDashboard = () => {
   }
 
   const dashboardStats = [
-    { title: "Total Inquiries", value: "45", icon: Users, color: "text-school-blue" },
-    { title: "Gallery Images", value: state.data.galleryImages.length.toString(), icon: Image, color: "text-school-orange" },
-    { title: "Active Notices", value: state.data.notices.length.toString(), icon: Bell, color: "text-green-600" },
-    { title: "Page Updates", value: "12", icon: FileText, color: "text-purple-600" }
+    { 
+      title: "Total Inquiries", 
+      value: state.data.admissionInquiries.length.toString(), 
+      icon: Users, 
+      color: "text-school-blue" 
+    },
+    { 
+      title: "Gallery Images", 
+      value: state.data.galleryImages.length.toString(), 
+      icon: Image, 
+      color: "text-school-orange" 
+    },
+    { 
+      title: "Active Notices", 
+      value: state.data.notices.length.toString(), 
+      icon: Bell, 
+      color: "text-green-600" 
+    },
+    { 
+      title: "Page Visits", 
+      value: pageVisits.toString(), 
+      icon: FileText, 
+      color: "text-purple-600" 
+    }
   ];
 
   const handleActivityClick = (activity: string) => {
@@ -93,10 +124,15 @@ const AdminDashboard = () => {
       case 'notice':
         setActiveTab('notices');
         break;
+      case 'approval':
+        setActiveTab('admin-approval');
+        break;
       default:
         break;
     }
   };
+
+  const pendingRequests = state.data.adminRequests?.filter(req => req.status === 'pending').length || 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -138,13 +174,21 @@ const AdminDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="content">Content</TabsTrigger>
             <TabsTrigger value="gallery">Gallery</TabsTrigger>
             <TabsTrigger value="notices">Notices</TabsTrigger>
             <TabsTrigger value="admissions">Admissions</TabsTrigger>
             <TabsTrigger value="contact">Contact</TabsTrigger>
+            <TabsTrigger value="admin-approval" className="relative">
+              Admin Approval
+              {pendingRequests > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {pendingRequests}
+                </span>
+              )}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -204,6 +248,18 @@ const AdminDashboard = () => {
                         <p className="text-sm text-gray-600">1 day ago</p>
                       </div>
                     </div>
+                    {pendingRequests > 0 && (
+                      <div 
+                        className="flex items-center space-x-3 p-3 bg-purple-50 rounded-lg cursor-pointer hover:bg-purple-100 transition-colors"
+                        onClick={() => handleActivityClick('approval')}
+                      >
+                        <UserCheck className="h-5 w-5 text-purple-600" />
+                        <div>
+                          <p className="font-medium">{pendingRequests} admin access request(s) pending</p>
+                          <p className="text-sm text-gray-600">Requires your attention</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -228,6 +284,10 @@ const AdminDashboard = () => {
 
           <TabsContent value="contact">
             <ContactManager />
+          </TabsContent>
+
+          <TabsContent value="admin-approval">
+            <AdminApprovalManager />
           </TabsContent>
         </Tabs>
       </div>
