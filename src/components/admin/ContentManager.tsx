@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -45,6 +44,17 @@ const ContentManager = () => {
     toast({
       title: "Content Updated",
       description: "General content has been updated successfully.",
+    });
+  };
+
+  const handleSchoolLogoUpload = (imageUrl: string) => {
+    dispatch({
+      type: 'UPDATE_SCHOOL_DATA',
+      payload: { schoolLogo: imageUrl }
+    });
+    toast({
+      title: "School Logo Updated",
+      description: "School logo has been updated successfully and will appear in the header.",
     });
   };
 
@@ -166,6 +176,12 @@ const ContentManager = () => {
           General Content
         </Button>
         <Button
+          variant={activeSection === 'branding' ? 'default' : 'ghost'}
+          onClick={() => setActiveSection('branding')}
+        >
+          School Branding
+        </Button>
+        <Button
           variant={activeSection === 'updates' ? 'default' : 'ghost'}
           onClick={() => setActiveSection('updates')}
         >
@@ -204,14 +220,6 @@ const ContentManager = () => {
               </div>
 
               <div>
-                <ImageUpload
-                  label="School Name Image (replaces text header)"
-                  currentImage={state.data.schoolNameImage}
-                  onImageUpload={handleSchoolNameImageUpload}
-                />
-              </div>
-
-              <div>
                 <Label htmlFor="welcomeMessage">Welcome Message</Label>
                 <Textarea
                   id="welcomeMessage"
@@ -239,6 +247,40 @@ const ContentManager = () => {
                   onChange={handleGeneralChange}
                   rows={4}
                 />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* School Branding */}
+      {activeSection === 'branding' && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>School Logo & Branding</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <ImageUpload
+                  label="School Logo (appears in header)"
+                  currentImage={state.data.schoolLogo}
+                  onImageUpload={handleSchoolLogoUpload}
+                />
+                <p className="text-sm text-gray-500 mt-2">
+                  Recommended: Square image, 256x256px or larger for best quality
+                </p>
+              </div>
+
+              <div>
+                <ImageUpload
+                  label="School Name Image (replaces text header)"
+                  currentImage={state.data.schoolNameImage}
+                  onImageUpload={handleSchoolNameImageUpload}
+                />
+                <p className="text-sm text-gray-500 mt-2">
+                  Optional: Upload an image version of your school name to replace the text header
+                </p>
               </div>
             </CardContent>
           </Card>
