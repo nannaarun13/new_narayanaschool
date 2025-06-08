@@ -53,16 +53,11 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				'school-blue': {
-					DEFAULT: 'hsl(var(--school-blue))',
-					light: 'hsl(var(--school-blue-light))',
-					dark: 'hsl(var(--school-blue-dark))'
-				},
-				'school-orange': {
-					DEFAULT: 'hsl(var(--school-orange))',
-					light: 'hsl(var(--school-orange-light))',
-					dark: 'hsl(var(--school-orange-dark))'
-				},
+				'school-blue': 'hsl(var(--school-blue))',
+				'school-orange': 'hsl(var(--school-orange))',
+				'school-white': 'hsl(var(--school-white))',
+				'school-blue-light': 'hsl(var(--school-blue-light))',
+				'school-orange-light': 'hsl(var(--school-orange-light))',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
