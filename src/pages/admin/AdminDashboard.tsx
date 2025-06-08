@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,27 +34,17 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [authChecked, setAuthChecked] = useState(false);
-  const [pageVisits] = useState(Math.floor(Math.random() * 1000) + 500);
+  const [pageVisits] = useState(Math.floor(Math.random() * 1000) + 500); // Simulated page visits
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setAuthChecked(true);
-      
-      // Give Firebase time to fully initialize before making auth decisions
-      setTimeout(() => {
-        if (!currentUser) {
-          // Check for stored admin credentials for auto-login
-          const storedEmail = localStorage.getItem('adminEmail');
-          const storedPassword = localStorage.getItem('adminPassword');
-          
-          if (!storedEmail || !storedPassword) {
-            navigate('/login');
-          }
-        }
+      if (currentUser) {
+        setUser(currentUser);
         setLoading(false);
-      }, 1000);
+      } else {
+        // Check for auto-login
+        navigate('/login');
+      }
     });
 
     return () => unsubscribe();
@@ -70,9 +61,6 @@ const AdminDashboard = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      // Clear stored credentials
-      localStorage.removeItem('adminEmail');
-      localStorage.removeItem('adminPassword');
       toast({
         title: "Logged Out",
         description: "You have been successfully logged out.",
@@ -87,13 +75,12 @@ const AdminDashboard = () => {
     }
   };
 
-  if (loading || !authChecked) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <Shield className="h-16 w-16 text-school-blue mx-auto mb-4 animate-pulse" />
           <p className="text-gray-600">Loading admin dashboard...</p>
-          <p className="text-sm text-gray-500 mt-2">Verifying authentication...</p>
         </div>
       </div>
     );
