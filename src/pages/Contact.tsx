@@ -7,10 +7,6 @@ const Contact = () => {
   const { state } = useSchool();
   const { contactInfo } = state.data;
 
-  const handleMapClick = () => {
-    window.open('https://www.google.com/maps/search/?api=1&query=8G49%2BHFJ%2C%20Sri%20Laxmi%20Nagar%20Colony%2C%20Badangpet%2C%20Hyderabad%2C%20Telangana%20500058', '_blank');
-  };
-
   return (
     <div className="min-h-screen bg-school-white">
       <div className="container mx-auto px-4 py-8 space-y-12">
@@ -82,24 +78,32 @@ const Contact = () => {
               <CardTitle className="text-2xl text-school-blue">Find Us</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <div 
-                className="cursor-pointer rounded-lg overflow-hidden"
-                onClick={handleMapClick}
-                title="Click to open in Google Maps"
-              >
-                <div className="mapouter" style={{position: 'relative', textAlign: 'right', width: '100%', height: '450px'}}>
-                  <div className="gmap_canvas" style={{overflow: 'hidden', background: 'none !important', width: '100%', height: '450px'}}>
-                    <iframe 
-                      width="100%" 
-                      height="450px" 
-                      style={{border: 0}} 
-                      allowFullScreen 
-                      loading="lazy" 
-                      referrerPolicy="no-referrer-when-downgrade" 
-                      src="https://www.google.com/maps/embed/v1/search?q=8G49%2BHFJ%2C%20Sri%20Laxmi%20Nagar%20Colony%2C%20Badangpet%2C%20Hyderabad%2C%20Telangana%20500058&key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"
-                      title="School Location"
-                    />
-                  </div>
+              <div className="embed-map-responsive">
+                <div className="embed-map-container">
+                  <iframe 
+                    className="embed-map-frame" 
+                    frameBorder="0" 
+                    scrolling="no" 
+                    marginHeight={0} 
+                    marginWidth={0} 
+                    src="https://maps.google.com/maps?width=600&height=600&hl=en&q=17%C2%B018%2733.1%22N%2078%C2%B030%2733.9%22E&t=&z=14&ie=UTF8&iwloc=B&output=embed"
+                    title="School Location"
+                  />
+                  <a 
+                    href="https://sprunkiretake.net" 
+                    style={{
+                      fontSize: '2px',
+                      color: 'gray',
+                      position: 'absolute',
+                      bottom: 0,
+                      left: 0,
+                      zIndex: 1,
+                      maxHeight: '1px',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    sprunki retake
+                  </a>
                 </div>
               </div>
               <p className="text-sm text-gray-500 mt-2 text-center">
@@ -109,6 +113,32 @@ const Contact = () => {
           </Card>
         </section>
       </div>
+      
+      <style jsx>{`
+        .embed-map-responsive {
+          position: relative;
+          text-align: right;
+          width: 100%;
+          height: 0;
+          padding-bottom: 100%;
+        }
+        .embed-map-container {
+          overflow: hidden;
+          background: none !important;
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
+        .embed-map-frame {
+          width: 100% !important;
+          height: 100% !important;
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
+      `}</style>
     </div>
   );
 };

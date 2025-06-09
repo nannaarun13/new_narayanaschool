@@ -1,13 +1,12 @@
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Users, 
   Image, 
   Bell, 
-  Settings, 
   FileText, 
   Phone,
   Shield,
@@ -34,23 +33,38 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [pageVisits] = useState(Math.floor(Math.random() * 1000) + 500); // Simulated page visits
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [pageVisits] = useState(Math.floor(Math.random() * 1000) + 500);
 
   useEffect(() => {
+    // Check for admin credentials first
+    const adminEmail = localStorage.getItem('adminEmail');
+    const adminPassword = localStorage.getItem('adminPassword');
+    const adminLoggedIn = localStorage.getItem('adminLoggedIn');
+    
+    if (adminEmail === 'arunnanna3@gmail.com' && adminPassword === 'Arun@2004' && adminLoggedIn === 'true') {
+      setIsAdminLoggedIn(true);
+      setUser({ email: adminEmail, displayName: 'Admin' });
+      setLoading(false);
+      return;
+    }
+
+    // Check Firebase auth state
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        setLoading(false);
+        setIsAdminLoggedIn(true);
       } else {
-        // Check for auto-login
-        navigate('/login');
+        // No user authenticated, redirect to login
+        navigate('/login', { replace: true });
       }
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, [navigate]);
 
-  // Simulate page visits counter (in real app, this would come from analytics)
+  // Simulate page visits counter
   useEffect(() => {
     dispatch({
       type: 'UPDATE_SCHOOL_DATA',
@@ -60,12 +74,21 @@ const AdminDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      // Clear admin credentials
+      localStorage.removeItem('adminEmail');
+      localStorage.removeItem('adminPassword');
+      localStorage.removeItem('adminLoggedIn');
+      
+      // Sign out from Firebase if applicable
+      if (auth.currentUser) {
+        await signOut(auth);
+      }
+      
       toast({
         title: "Logged Out",
         description: "You have been successfully logged out.",
       });
-      navigate('/login');
+      navigate('/login', { replace: true });
     } catch (error) {
       toast({
         title: "Logout Error",
@@ -81,6 +104,17 @@ const AdminDashboard = () => {
         <div className="text-center">
           <Shield className="h-16 w-16 text-school-blue mx-auto mb-4 animate-pulse" />
           <p className="text-gray-600">Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAdminLoggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Shield className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <p className="text-gray-600">Access denied. Redirecting to login...</p>
         </div>
       </div>
     );

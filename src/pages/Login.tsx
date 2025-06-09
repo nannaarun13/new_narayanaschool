@@ -1,14 +1,12 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Shield } from 'lucide-react';
-import { signInWithEmailAndPassword, sendPasswordResetEmail, createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
+import { signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 import { useNavigate } from 'react-router-dom';
 import { useSchool } from '@/contexts/SchoolContext';
 
@@ -21,6 +19,7 @@ const Login = () => {
   const [mode, setMode] = useState<LoginMode>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   
   // Login form data
   const [loginData, setLoginData] = useState({
@@ -46,6 +45,31 @@ const Login = () => {
   const [forgotPasswordData, setForgotPasswordData] = useState({
     email: ''
   });
+
+  // Check if user is already authenticated
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is already signed in, redirect to admin
+        navigate('/admin', { replace: true });
+      } else {
+        // Check for stored admin credentials
+        const storedEmail = localStorage.getItem('adminEmail');
+        const storedPassword = localStorage.getItem('adminPassword');
+        
+        if (storedEmail === 'arunnanna3@gmail.com' && storedPassword === 'Arun@2004') {
+          // Auto-login for admin
+          setLoginData({ email: storedEmail, password: storedPassword });
+          setTimeout(() => {
+            navigate('/admin', { replace: true });
+          }, 1000);
+        }
+      }
+      setInitialLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [navigate]);
 
   const handleLoginInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -166,13 +190,18 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Auto-login for admin
+    // Auto-login for admin with credential storage
     if (loginData.email === 'arunnanna3@gmail.com' && loginData.password === 'Arun@2004') {
+      // Store credentials for persistence across devices and hosting
+      localStorage.setItem('adminEmail', loginData.email);
+      localStorage.setItem('adminPassword', loginData.password);
+      localStorage.setItem('adminLoggedIn', 'true');
+      
       toast({
         title: "Admin Login Successful",
         description: "Welcome to the admin panel!",
       });
-      navigate('/admin');
+      navigate('/admin', { replace: true });
       return;
     }
     
@@ -187,7 +216,7 @@ const Login = () => {
         title: "Login Successful",
         description: "Welcome to the admin panel!",
       });
-      navigate('/admin');
+      navigate('/admin', { replace: true });
     } catch (error: any) {
       let errorMessage = "Login failed. Please try again.";
       
@@ -295,6 +324,18 @@ const Login = () => {
     }
     setLoading(false);
   };
+
+  // Show loading screen while checking authentication
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-school-blue-light to-school-orange-light">
+        <div className="text-center">
+          <Shield className="h-16 w-16 text-school-blue mx-auto mb-4 animate-pulse" />
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
   const renderLoginForm = () => (
     <form onSubmit={handleLogin} className="space-y-6">

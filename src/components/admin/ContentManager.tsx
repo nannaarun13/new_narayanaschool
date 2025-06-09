@@ -48,6 +48,28 @@ const ContentManager = () => {
     });
   };
 
+  const handleSchoolLogoUpload = (imageUrl: string) => {
+    dispatch({
+      type: 'UPDATE_SCHOOL_DATA',
+      payload: { schoolLogo: imageUrl }
+    });
+    toast({
+      title: "School Logo Updated",
+      description: "School logo has been updated successfully.",
+    });
+  };
+
+  const handleSchoolImageUpload = (imageUrl: string) => {
+    dispatch({
+      type: 'UPDATE_SCHOOL_DATA',
+      payload: { schoolImage: imageUrl }
+    });
+    toast({
+      title: "School Image Updated",
+      description: "School main image has been updated successfully.",
+    });
+  };
+
   const handleSchoolNameImageUpload = (imageUrl: string) => {
     dispatch({
       type: 'UPDATE_SCHOOL_DATA',
@@ -192,7 +214,7 @@ const ContentManager = () => {
                 </Button>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div>
                 <Label htmlFor="schoolName">School Name</Label>
                 <Input
@@ -200,6 +222,22 @@ const ContentManager = () => {
                   name="schoolName"
                   value={generalData.schoolName}
                   onChange={handleGeneralChange}
+                />
+              </div>
+
+              <div>
+                <ImageUpload
+                  label="School Logo"
+                  currentImage={state.data.schoolLogo}
+                  onImageUpload={handleSchoolLogoUpload}
+                />
+              </div>
+
+              <div>
+                <ImageUpload
+                  label="School Main Image"
+                  currentImage={state.data.schoolImage}
+                  onImageUpload={handleSchoolImageUpload}
                 />
               </div>
 
